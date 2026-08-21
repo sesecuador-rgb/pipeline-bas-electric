@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Pipeline Comercial BAS Electric</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#101E28">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pipeline BAS">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#101E28;
+  --navy-2:#16303F;
+  --steel:#1D4E63;
+  --steel-light:#2E6B85;
+  --brass:#C9A227;
+  --brass-light:#E0BE4E;
+  --bg:#EEF2F1;
+  --card:#FFFFFF;
+  --ink:#1C2B33;
+  --muted:#65787F;
+  --border:#DCE3E2;
+  --green:#2E7D5B;
+  --green-bg:#E7F3ED;
+  --amber:#B9790A;
+  --amber-bg:#FBF1DD;
+  --red:#B33A2E;
+  --red-bg:#FBEAE7;
+  --lcd-bg:#0C201B;
+  --lcd-fg:#43E795;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  height:100vh;
+  overflow:hidden;
+  font-size:14px;
+}
+.display{font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:.01em;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit; font-size:13px;}
+::-webkit-scrollbar{width:8px; height:8px;}
+::-webkit-scrollbar-thumb{background:#C7D0CF; border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+#app{display:flex; height:100vh; width:100vw;}
+
+/* ===== SIDEBAR ===== */
+#sidebar{
+  width:78px; background:var(--navy); flex-shrink:0;
+  display:flex; flex-direction:column; align-items:center;
+  padding:16px 0; gap:4px;
+}
+.brand-mark{
+  width:46px; height:46px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:22px; box-shadow:0 2px 8px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.brand-mark svg{width:24px; height:24px;}
+.navbtn{
+  width:56px; padding:9px 0 7px; border:none; background:transparent; color:#8FA3AC;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  border-radius:10px; transition:.15s;
+}
+.navbtn svg{width:19px; height:19px; stroke:currentColor; fill:none; stroke-width:1.7;}
+.navbtn span{font-size:10.5px; font-weight:600; letter-spacing:.02em;}
+.navbtn:hover{background:rgba(255,255,255,.06); color:#DCE7EA;}
+.navbtn.active{background:var(--steel); color:#fff;}
+.navbtn .badge{
+  position:absolute; margin-top:-30px; margin-left:22px;
+  background:var(--brass); color:#1C2B33; font-size:9px; font-weight:700;
+  border-radius:20px; min-width:15px; height:15px; display:flex; align-items:center; justify-content:center; padding:0 3px;
+}
+#sidebar-bottom{margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:2px;}
+.company-tag{color:#526870; font-size:9.5px; text-align:center; line-height:1.3; padding:10px 4px;}
+
+/* ===== MAIN ===== */
+#main{flex:1; display:flex; flex-direction:column; min-width:0;}
+#topbar{
+  height:60px; background:var(--card); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 22px; gap:16px; flex-shrink:0;
+}
+#topbar h1{font-family:'Barlow Condensed'; font-weight:700; font-size:21px; letter-spacing:.01em;}
+#topbar .sub{color:var(--muted); font-size:12px; margin-top:1px;}
+#topbar-search{
+  margin-left:auto; width:280px; padding:8px 12px; border:1px solid var(--border);
+  border-radius:8px; background:var(--bg); font-size:13px; outline:none;
+}
+#topbar-search:focus{border-color:var(--steel-light); background:#fff;}
+.btn{
+  padding:9px 15px; border-radius:8px; border:1px solid var(--border); background:#fff;
+  font-size:13px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px;
+  white-space:nowrap;
+}
+.btn:hover{border-color:var(--steel-light);}
+.btn-primary{background:var(--steel); color:#fff; border-color:var(--steel);}
+.btn-primary:hover{background:var(--steel-light);}
+.btn-brass{background:var(--brass); color:#20220a; border-color:var(--brass);}
+.btn-ghost{border-color:transparent; background:transparent;}
+.btn-ghost:hover{background:var(--bg);}
+.btn-sm{padding:6px 10px; font-size:12px;}
+.btn-danger{color:var(--red);}
+.btn svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2;}
+
+#view{flex:1; overflow-y:auto; padding:20px 26px 40px;}
+
+/* ===== GRID / CARDS ===== */
+.grid{display:grid; gap:14px;}
+.g-4{grid-template-columns:repeat(4,1fr);}
+.g-3{grid-template-columns:repeat(3,1fr);}
+.g-2{grid-template-columns:repeat(2,1fr);}
+.card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px;}
+.card-title{font-family:'Barlow Condensed'; font-weight:700; font-size:15px; letter-spacing:.02em; text-transform:uppercase; color:var(--steel); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;}
+
+/* KPI indicator (LCD look) */
+.kpi{
+  background:var(--lcd-bg); border-radius:12px; padding:14px 16px; position:relative; overflow:hidden;
+  border:1px solid #0a1a15;
+}
+.kpi::before{content:""; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--brass),var(--green));}
+.kpi .label{color:#7FA895; font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px;}
+.kpi .value{font-family:'IBM Plex Mono'; font-weight:600; font-size:28px; color:var(--lcd-fg); line-height:1;}
+.kpi .value small{font-size:14px; color:#6FDBA1;}
+.kpi .foot{color:#5C8574; font-size:11px; margin-top:5px;}
+
+.section-label{font-family:'Barlow Condensed'; font-size:12.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:22px 0 10px;}
+.section-label:first-child{margin-top:0;}
+
+/* Task list (today) */
+.task-row{
+  display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:9px; background:var(--bg);
+  margin-bottom:7px; border:1px solid transparent;
+}
+.task-row:hover{border-color:var(--border);}
+.task-check{
+  width:20px; height:20px; border-radius:6px; border:2px solid #C4CFCE; flex-shrink:0; background:#fff;
+  display:flex; align-items:center; justify-content:center;
+}
+.task-check svg{width:12px; height:12px; display:none; stroke:#fff; fill:none; stroke-width:3;}
+.task-row.overdue .task-check{border-color:var(--red);}
+.tag{
+  font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em;
+}
+.tag-llamada{background:#E4EEF6; color:#1E5A85;}
+.tag-whatsapp{background:#E1F4E9; color:#1F7A45;}
+.tag-correo{background:#F1E9F8; color:#6B3FA0;}
+.tag-visita{background:var(--amber-bg); color:var(--amber);}
+.tag-cotizacion{background:#FDECE4; color:#B4531D;}
+.tag-seguimiento{background:#EEF0F5; color:#454F63;}
+.tag-oc{background:var(--green-bg); color:var(--green);}
+
+.pill{padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700;}
+.pill-a{background:var(--red-bg); color:var(--red);}
+.pill-b{background:var(--amber-bg); color:var(--amber);}
+.pill-c{background:#EEF0F5; color:var(--muted);}
+.pill-cliente{background:var(--green-bg); color:var(--green);}
+.pill-inactivo{background:#EEF0F5; color:var(--muted);}
+
+/* funnel */
+.funnel{display:flex; align-items:stretch; gap:2px; margin-top:6px;}
+.funnel-step{flex:1; text-align:center; padding:12px 6px; position:relative;}
+.funnel-step .n{font-family:'IBM Plex Mono'; font-weight:600; font-size:22px; color:var(--steel);}
+.funnel-step .l{font-size:10.5px; color:var(--muted); margin-top:2px; text-transform:uppercase; letter-spacing:.04em;}
+.funnel-step:not(:last-child)::after{
+  content:"→"; position:absolute; right:-3px; top:14px; color:#C4CFCE; font-size:15px;
+}
+
+.goal-row{display:flex; align-items:center; gap:10px; margin-bottom:9px;}
+.goal-label{width:110px; font-size:12.5px; font-weight:600; flex-shrink:0;}
+.goal-bar{flex:1; height:9px; background:#E8ECEB; border-radius:20px; overflow:hidden;}
+.goal-bar-fill{height:100%; border-radius:20px;}
+.goal-num{width:96px; text-align:right; font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--muted); flex-shrink:0;}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block; margin-left:6px;}
+
+.alert-row{display:flex; gap:10px; align-items:flex-start; padding:9px 11px; border-radius:8px; margin-bottom:6px; font-size:12.5px;}
+.alert-row.warn{background:var(--amber-bg); color:#8A5C06;}
+.alert-row.danger{background:var(--red-bg); color:#8A2A20;}
+.alert-row.info{background:#E9F1F8; color:#1E5A85;}
+
+/* Empresas list */
+.table{width:100%; border-collapse:collapse;}
+.table th{
+  text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted);
+  padding:8px 12px; border-bottom:1px solid var(--border); font-weight:700;
+}
+.table td{padding:11px 12px; border-bottom:1px solid #EEF1F0; font-size:13px; vertical-align:middle;}
+.table tr.clickable:hover{background:var(--bg); cursor:pointer;}
+.avatar-sq{
+  width:32px; height:32px; border-radius:7px; background:var(--steel); color:#fff; display:flex; align-items:center;
+  justify-content:center; font-family:'Barlow Condensed'; font-weight:700; font-size:13px; flex-shrink:0;
+}
+.company-cell{display:flex; align-items:center; gap:10px;}
+.company-name{font-weight:600;}
+.company-sub{font-size:11.5px; color:var(--muted);}
+
+.filters{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;}
+.chip{
+  padding:6px 13px; border-radius:20px; border:1px solid var(--border); background:#fff; font-size:12.5px; font-weight:600;
+  color:var(--muted);
+}
+.chip.active{background:var(--steel); color:#fff; border-color:var(--steel);}
+
+/* Kanban */
+#kanban{display:flex; gap:12px; overflow-x:auto; padding-bottom:14px; height:100%;}
+.kcol{min-width:230px; max-width:230px; flex-shrink:0; display:flex; flex-direction:column;}
+.kcol-head{padding:8px 4px 10px; display:flex; align-items:center; justify-content:space-between;}
+.kcol-head .t{font-family:'Barlow Condensed'; font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:.02em; color:var(--ink);}
+.kcol-head .n{font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); background:var(--bg); padding:2px 7px; border-radius:20px;}
+.kcol-body{flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:2px;}
+.kcard{
+  background:#fff; border:1px solid var(--border); border-left:4px solid var(--steel); border-radius:8px; padding:10px 11px; font-size:12.5px;
+}
+.kcard .name{font-weight:700; margin-bottom:3px;}
+.kcard .val{font-family:'IBM Plex Mono'; color:var(--brass); font-weight:600; font-size:12px; margin-top:5px;}
+.kcard .meta{color:var(--muted); font-size:11px; margin-top:4px;}
+.kcard.overdue{border-left-color:var(--red); background:var(--red-bg);}
+
+/* Detail / drawer */
+#drawer-backdrop{position:fixed; inset:0; background:rgba(16,30,40,.42); display:none; z-index:40;}
+#drawer{
+  position:fixed; top:0; right:0; bottom:0; width:640px; background:var(--bg); box-shadow:-6px 0 24px rgba(0,0,0,.15);
+  transform:translateX(100%); transition:transform .22s ease; z-index:41; display:flex; flex-direction:column;
+}
+#drawer.open{transform:translateX(0);}
+#drawer-backdrop.open{display:block;}
+.drawer-head{background:var(--navy); color:#fff; padding:20px 22px; flex-shrink:0;}
+.drawer-head .top{display:flex; justify-content:space-between; align-items:flex-start;}
+.drawer-head h2{font-family:'Barlow Condensed'; font-size:24px; font-weight:700;}
+.drawer-head .meta{color:#9FB4BC; font-size:12.5px; margin-top:3px;}
+.drawer-close{background:rgba(255,255,255,.1); border:none; color:#fff; width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center;}
+.drawer-tabs{display:flex; gap:2px; padding:0 22px; margin-top:16px;}
+.dtab{padding:8px 3px; margin-right:18px; color:#9FB4BC; font-size:12.5px; font-weight:600; border-bottom:2px solid transparent; background:none; border-top:none; border-left:none; border-right:none;}
+.dtab.active{color:#fff; border-bottom-color:var(--brass);}
+.drawer-body{flex:1; overflow-y:auto; padding:18px 22px 60px;}
+
+.field{margin-bottom:12px;}
+.field label{display:block; font-size:11.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; margin-bottom:4px;}
+.field input, .field select, .field textarea{
+  width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:8px; background:#fff; outline:none;
+}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--steel-light);}
+.field textarea{resize:vertical; min-height:60px;}
+.field-row{display:flex; gap:10px;}
+.field-row .field{flex:1;}
+
+.mini-list-item{
+  display:flex; align-items:center; justify-content:space-between; background:#fff; border:1px solid var(--border);
+  border-radius:9px; padding:10px 12px; margin-bottom:8px;
+}
+.mini-list-item .name{font-weight:600; font-size:13px;}
+.mini-list-item .sub{font-size:11.5px; color:var(--muted); margin-top:2px;}
+.icon-btn{background:none; border:none; color:var(--muted); padding:5px; border-radius:6px; display:flex;}
+.icon-btn:hover{background:var(--bg); color:var(--ink);}
+.icon-btn svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2;}
+
+.timeline{position:relative; padding-left:20px;}
+.timeline::before{content:""; position:absolute; left:5px; top:4px; bottom:4px; width:2px; background:var(--border);}
+.tl-item{position:relative; padding-bottom:16px;}
+.tl-item::before{content:""; position:absolute; left:-19px; top:3px; width:10px; height:10px; border-radius:50%; background:var(--steel); border:2px solid #fff;}
+.tl-date{font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--muted);}
+.tl-text{font-size:13px; margin-top:2px;}
+
+/* Modal */
+#modal-backdrop{position:fixed; inset:0; background:rgba(16,30,40,.5); display:none; align-items:center; justify-content:center; z-index:50;}
+#modal-backdrop.open{display:flex;}
+#modal{background:#fff; border-radius:14px; width:540px; max-height:88vh; display:flex; flex-direction:column; overflow:hidden;}
+.modal-head{padding:18px 22px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;}
+.modal-head h3{font-family:'Barlow Condensed'; font-size:19px; font-weight:700;}
+.modal-body{padding:18px 22px; overflow-y:auto;}
+.modal-foot{padding:16px 22px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px;}
+
+.empty-state{text-align:center; padding:36px 10px; color:var(--muted);}
+.empty-state svg{width:34px; height:34px; stroke:#C4CFCE; margin-bottom:10px;}
+
+/* Quotation doc */
+.quote-doc{background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden;}
+.quote-head{background:var(--navy); color:#fff; padding:22px 26px; display:flex; justify-content:space-between; align-items:flex-start;}
+.quote-brand{display:flex; align-items:center; gap:12px;}
+.quote-brand .mark{width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.quote-brand .mark svg{width:26px; height:26px;}
+.quote-brand .txt div:first-child{font-family:'Barlow Condensed'; font-weight:700; font-size:19px; letter-spacing:.02em;}
+.quote-brand .txt div:last-child{font-size:11px; color:#9FB4BC;}
+.quote-num{text-align:right;}
+.quote-num .n{font-family:'IBM Plex Mono'; font-size:20px; color:var(--brass-light); font-weight:600;}
+.quote-num .d{font-size:11px; color:#9FB4BC; margin-top:2px;}
+.quote-body{padding:24px 26px;}
+.quote-parties{display:flex; gap:24px; margin-bottom:20px;}
+.quote-parties .p{flex:1;}
+.quote-parties .p .h{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700; margin-bottom:5px;}
+.quote-parties .p .l{font-size:13px; margin-bottom:2px;}
+.quote-table{width:100%; border-collapse:collapse; margin-top:6px;}
+.quote-table th{background:var(--bg); text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); padding:9px 12px; font-weight:700;}
+.quote-table td{padding:11px 12px; border-bottom:1px solid #EEF1F0; font-size:13px;}
+.quote-table .r{text-align:right;}
+.quote-totals{margin-top:14px; margin-left:auto; width:260px;}
+.quote-totals .row{display:flex; justify-content:space-between; padding:6px 0; font-size:13px;}
+.quote-totals .row.total{border-top:2px solid var(--navy); margin-top:4px; padding-top:10px; font-weight:700; font-size:16px; font-family:'IBM Plex Mono';}
+.quote-foot{background:var(--bg); padding:16px 26px; font-size:11.5px; color:var(--muted); display:flex; justify-content:space-between;}
+.status-strip{padding:10px 26px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; display:flex; align-items:center; gap:8px;}
+
+@media print{
+  #sidebar,#topbar,.no-print{display:none !important;}
+  body{overflow:visible;}
+  #view{overflow:visible; padding:0;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <nav id="sidebar">
+    <div class="brand-mark">
+      <img src="data:image/png;base64,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" alt="BAS Electric" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+    </div>
+    <button class="navbtn active" data-view="dashboard">
+      <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9ZM14 20h6v-9h-6v9ZM14 4v3M4 20h6v-4H4v4Z"/></svg>
+      <span>Hoy</span>
+    </button>
+    <button class="navbtn" data-view="empresas">
+      <svg viewBox="0 0 24 24"><path d="M4 21V6l8-3 8 3v15M9 21v-6h6v6M9 10h.01M13 10h.01M9 14h.01M13 14h.01"/></svg>
+      <span>Empresas</span>
+    </button>
+    <button class="navbtn" data-view="pipeline">
+      <svg viewBox="0 0 24 24"><path d="M3 5h18M3 5l7 8v6l4 2v-8l7-8"/></svg>
+      <span>Pipeline</span>
+    </button>
+    <button class="navbtn" data-view="cotizaciones">
+      <svg viewBox="0 0 24 24"><path d="M7 3h10v18l-2-1.5L13 21l-2-1.5L9 21l-2-1.5L5 21V5a2 2 0 0 1 2-2ZM8 8h8M8 12h8M8 16h5"/></svg>
+      <span>Cotiz.</span>
+    </button>
+    <button class="navbtn" data-view="reportes">
+      <svg viewBox="0 0 24 24"><path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/></svg>
+      <span>Reportes</span>
+    </button>
+    <div id="sidebar-bottom">
+      <button class="navbtn" data-view="config"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.6 1.6 0 0 0-1.5 1Z"/></svg><span>Metas</span></button>
+      <div class="company-tag">BAS<br>ELECTRIC</div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div id="topbar">
+      <div>
+        <h1 id="topbar-title">¿Qué tengo que hacer hoy?</h1>
+        <div class="sub" id="topbar-sub"></div>
+      </div>
+      <input id="topbar-search" placeholder="Buscar empresa, RUC, contacto…">
+      <button class="btn" id="btn-import-csv">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg> Importar CSV
+      </button>
+      <button class="btn btn-primary" id="btn-new-empresa">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Nueva empresa
+      </button>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div id="drawer-backdrop"></div>
+<div id="drawer"></div>
+
+<div id="modal-backdrop">
+  <div id="modal"></div>
+</div>
+
+<script>
+/* ============================================================
+   BAS ELECTRIC — CRM COMERCIAL
+   Almacenamiento persistente vía window.storage (personal)
+   ============================================================ */
+
+const ESTADOS = [
+  {id:1, k:'prospecto_nuevo', label:'Prospecto nuevo', color:'#8593A0'},
+  {id:2, k:'contacto_iniciado', label:'Contacto iniciado', color:'#3E7FB0'},
+  {id:3, k:'contacto_conseguido', label:'Contacto conseguido', color:'#2E7FA6'},
+  {id:4, k:'necesidad_identificada', label:'Necesidad identificada', color:'#3F8F82'},
+  {id:5, k:'visita_agendada', label:'Visita agendada', color:'#C9860A'},
+  {id:6, k:'visita_realizada', label:'Visita realizada', color:'#B9790A'},
+  {id:7, k:'cotizacion_pendiente', label:'Cotización pendiente', color:'#C05A20'},
+  {id:8, k:'cotizacion_enviada', label:'Cotización enviada', color:'#B4531D'},
+  {id:9, k:'negociacion', label:'Negociación', color:'#8B4BA8'},
+  {id:10, k:'ganada', label:'Ganada', color:'#2E7D5B'},
+  {id:11, k:'perdida', label:'Perdida', color:'#B33A2E'},
+  {id:12, k:'seguimiento_futuro', label:'Seguimiento futuro', color:'#65787F'},
+];
+const MOTIVOS_PERDIDA = ['Precio','Competencia','Sin presupuesto','Proyecto suspendido','Cliente no respondió','Lo realizó internamente','No era una necesidad real','Otro'];
+const FUENTES = ['Prospección BAS','Referido','Cliente anterior','Google','Redes sociales','WhatsApp','Página web','Recomendación','Otro'];
+const SECTORES = ['Alimentos','Balanceados','Arrocera','Camaronera / Procesadora','Plásticos','Químicos','Logística','Puertos','Bodegas','Reciclaje','Cemento y materiales','Construcción','Agroindustria','Manufactura','Otro'];
+const TIPOS_EQUIPO = ['Báscula camionera','Balanza de plataforma','Balanza de piso','Ensacadora','Dosificadora','Tolva','Indicador','Celda de carga','Sistema neumático','Compuerta','Otro'];
+const CARGOS = ['Gerencia','Jefe de mantenimiento','Gerente de mantenimiento','Jefe de planta','Jefe de producción','Instrumentación','Automatización','Compras','Otro'];
+const TIPOS_ACTIVIDAD = [
+  {k:'llamada', label:'Llamada', tag:'tag-llamada'},
+  {k:'whatsapp', label:'WhatsApp', tag:'tag-whatsapp'},
+  {k:'correo', label:'Correo', tag:'tag-correo'},
+  {k:'visita', label:'Visita', tag:'tag-visita'},
+  {k:'cotizacion', label:'Cotización', tag:'tag-cotizacion'},
+  {k:'seguimiento', label:'Seguimiento', tag:'tag-seguimiento'},
+  {k:'oc', label:'Orden de compra', tag:'tag-oc'},
+];
+
+let DATA = null; // {empresas:[], activityLog:[], cotizaciones:[], metas:{}}
+let VIEW = 'dashboard';
+let FILTER_CLASIF = 'todas';
+let SEARCH_Q = '';
+let SAVE_TIMER = null;
+
+const uid = () => Math.random().toString(36).slice(2,10);
+const todayISO = () => new Date().toISOString().slice(0,10);
+const fmtDate = (iso) => { if(!iso) return '—'; const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('es-EC',{day:'2-digit',month:'short'}); };
+const fmtDateFull = (iso) => { if(!iso) return '—'; const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('es-EC',{day:'2-digit',month:'short',year:'numeric'}); };
+const fmtUSD = (n) => '$' + (Number(n)||0).toLocaleString('en-US',{maximumFractionDigits:0});
+const daysBetween = (iso) => Math.floor((new Date(todayISO()) - new Date(iso+'T00:00:00'))/86400000);
+const estadoById = (id) => ESTADOS.find(e=>e.id===id) || ESTADOS[0];
+const initials = (name) => (name||'?').split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+const escapeHtml = (s) => (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* Base inicial de prospectos: BAS_Electric_200_Prospectos_Claude.csv */
+const IMPORTED_EMPRESAS_RAW = [{"nombre": "GISIS S.A.", "sector": "Alimentos balanceados / acuicultura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Produmar S.A.", "sector": "Acuicultura / alimentos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Alimentsa S.A.", "sector": "Alimentos balanceados", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Mexichem Ecuador S.A. / Plastigama", "sector": "Plásticos / tuberías", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "OMARSA S.A.", "sector": "Procesamiento de camarón", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Sika Ecuatoriana S.A.", "sector": "Químicos / construcción", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Expalsa Exportadora de Alimentos S.A.", "sector": "Procesamiento de camarón", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Productora Cartonera S.A. PROCARSA", "sector": "Cartón / empaques", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Promarisco S.A.", "sector": "Acuicultura / alimentos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Inprosa Industrial Procesadora Santay S.A.", "sector": "Alimentos balanceados", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Aquacargill del Ecuador Cía. Ltda.", "sector": "Alimentos balanceados acuícolas", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Cargill Aquanutrition Ecuador Cía. Ltda.", "sector": "Alimentos balanceados acuícolas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Biofeeder S.A.S.", "sector": "Alimentos para animales", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Ecuahielo S.A.", "sector": "Hielo / alimentos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Duralum S.A.", "sector": "Aluminio / manufactura", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industria Nacional de Ensamblajes S.A. INNACENSA", "sector": "Manufactura", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Motoindustria S.A.", "sector": "Manufactura / automotriz", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Indutorres S.A.", "sector": "Metalmecánica", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Britransformadores S.A.", "sector": "Eléctrica / transformadores", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industria Colombo Ecuatoriana de Carrocerías CARCEIN S.A.", "sector": "Metalmecánica", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Gasec S.A.", "sector": "Gases / industria", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industria Metalmecánica Almetal S.A. ALMETALSA", "sector": "Metalmecánica", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Agrecons S.A.", "sector": "Construcción / agregados", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Varaderos del Pacífico VARPACIFIC S.A.", "sector": "Astillero / metalmecánica", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Productora de Morteros y Aditivos Químicos MAQSA S.A.", "sector": "Morteros / químicos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Finmelec S.A.", "sector": "Fabricaciones industriales", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "San Miguel Industrias Ecuador SANMINDEC S.A.", "sector": "Plásticos / empaques", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industria Alucaps Ecuador GA S.A.", "sector": "Plásticos / empaques", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Plastic Company IH S.A.", "sector": "Plásticos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Surpapelcorp S.A.", "sector": "Papel", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Audiovision Electrónica Audioelec S.A.", "sector": "Manufactura electrónica", "ciudad": "Durán", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Unnomotors S.A.", "sector": "Ensamblaje / automotriz", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Unnocycles S.A.", "sector": "Ensamblaje / manufactura", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Corporación Sicorpmattress S.A.", "sector": "Manufactura", "ciudad": "Durán", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "FILARET S.A.", "sector": "Manufactura", "ciudad": "Durán", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Talleres Guevara S.A. TAGUESA", "sector": "Metalmecánica", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Pattison S.A.", "sector": "Manufactura", "ciudad": "Durán", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Cofina S.A.", "sector": "Cacao / alimentos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Agroindustrias Dajahu S.A.", "sector": "Arroz / agroindustria", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Procesadora del Río PRORIOSA", "sector": "Productos del mar", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Crimasa S.A.", "sector": "Productos del mar", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Lubricantes Internacionales S.A. LUBRISA", "sector": "Lubricantes", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Swissgas del Ecuador S.A.S.", "sector": "Gases industriales", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Disma", "sector": "Químicos industriales", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Tecnocalidad", "sector": "Reciclaje / plásticos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Superplywood", "sector": "Madera / tableros", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "NIRSA S.A.", "sector": "Pesca / alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Ecuador Kakao Processing PROECUAKAO S.A.", "sector": "Cacao / alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Salica del Ecuador S.A.", "sector": "Pesca / alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Unilever Andina Ecuador S.A.", "sector": "Alimentos / químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Sociedad Agrícola e Industrial San Carlos S.A.", "sector": "Azúcar / agroindustria", "ciudad": "Marcelino Maridueña", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Procesadora y Exportadora de Camarón PROCAMARONEX C. Ltda.", "sector": "Camarón", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industrias Lácteas Toni S.A.", "sector": "Lácteos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Cofimar S.A.", "sector": "Alimentos / pesca", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Natluk S.A.", "sector": "Alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Quicornac S.A.", "sector": "Alimentos / bebidas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Empresa Pesquera Polar S.A.", "sector": "Pesca / alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "DSM Nutritional Products Ecuador S.A.", "sector": "Ingredientes / nutrición", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Aditivos y Alimentos S.A. ADILISA", "sector": "Ingredientes / alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Alicorp Ecuador S.A.", "sector": "Alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Sumesa S.A.", "sector": "Alimentos / bebidas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Cepromar S.A.", "sector": "Productos del mar", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Comercial Pesquera Cristiansen S.A.", "sector": "Pesca / alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Futurcorp S.A.", "sector": "Alimentos / agroindustria", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Panadería California PANCALI S.A.", "sector": "Panificación", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Energías del Agro San Juan S.A. ENERAGRO", "sector": "Agroindustria / energía", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Aquagold S.A.", "sector": "Acuicultura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Avícola San Isidro S.A. AVISID", "sector": "Avícola / alimentos", "ciudad": "Isidro Ayora", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Inbalnor S.A.", "sector": "Alimentos / agroindustria", "ciudad": "Yaguachi", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Cervecería Nacional CN S.A.", "sector": "Bebidas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "The Tesalia Springs Company S.A.", "sector": "Bebidas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "AJEcuador S.A.", "sector": "Bebidas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Producargo S.A. Productora de Alcoholes", "sector": "Alcoholes / industria", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Refrescos Sin Gas S.A. RESGASA", "sector": "Bebidas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Codana S.A.", "sector": "Alcohol / agroindustria", "ciudad": "Milagro", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Unión Vinícola Internacional S.A.", "sector": "Bebidas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Pacific Bottling Company S.A. PBCOM", "sector": "Bebidas", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "IPAC S.A.", "sector": "Acero / metalmecánica", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Fábrica de Envases S.A. FADESA", "sector": "Envases / metal", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Mabe Ecuador S.A.", "sector": "Electrodomésticos / manufactura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Electrocables C.A.", "sector": "Cables / manufactura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Acerías Nacionales del Ecuador S.A. ANDEC", "sector": "Acero", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "FISA Fundiciones Industriales S.A.", "sector": "Fundición / metal", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Intaco Ecuador S.A.", "sector": "Materiales de construcción", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industria Ecuatoriana de Cables INCABLE S.A.", "sector": "Cables / manufactura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Pica Plásticos Industriales C.A.", "sector": "Plásticos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Plásticos del Litoral PLASTLIT S.A.", "sector": "Plásticos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Agricominsa Agrícola Comercial Industrial S.A.", "sector": "Plásticos / agroindustria", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Supralive S.A.", "sector": "Plásticos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Consuplast S.A.", "sector": "Plásticos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Sacos Durán Reysac S.A.", "sector": "Sacos / empaques", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Promaplast Procesadora de Materiales Plásticos S.A.", "sector": "Plásticos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Plásticos Panamericanos PLAPASA S.A.", "sector": "Plásticos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Plásticos Ecuatorianos S.A.", "sector": "Plásticos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Inplasban S.A.", "sector": "Plásticos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Sacoplast S.A.", "sector": "Sacos / Big Bags", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Pinturas Unidas S.A.", "sector": "Pinturas / químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Quimpac Ecuador S.A. QUIMPACSA", "sector": "Químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Adheplast S.A.", "sector": "Químicos / adhesivos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industrial Latina S.A. LAINDUSA", "sector": "Químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Calbaq S.A.", "sector": "Químicos / consumo", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Disan Ecuador S.A.", "sector": "Químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Laboratorios Rocnarf S.A.", "sector": "Farmacéutica", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Oviplax S.A.", "sector": "Químicos / plásticos", "ciudad": "Guayaquil", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Nederagro S.A.", "sector": "Agroquímicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Poliquim Polímeros y Químicos C.A.", "sector": "Químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Chemical Pharm del Ecuador C. Ltda.", "sector": "Farmacéutica / químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Laboratorios H.G. C.A.", "sector": "Farmacéutica", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Novaplast S.A.", "sector": "Plásticos / químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Pharmacy & Nutrition PHARNUTRI S.A.", "sector": "Farmacéutica / nutrición", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Indubras Ecuador S.A.", "sector": "Químicos / manufactura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Pyxis Industrias Comercio y Representaciones S.A.", "sector": "Industria / químicos", "ciudad": "Guayaquil", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Citera S.A.", "sector": "Químicos", "ciudad": "Guayaquil", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Andino Chemical del Ecuador ANDICHEMICAL S.A.", "sector": "Químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Indura Ecuador S.A.", "sector": "Gases industriales", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Mercantil Garzozi & Garbu S.A.", "sector": "Químicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Freeplastic S.A.", "sector": "Plásticos / químicos", "ciudad": "Guayaquil", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Codemet S.A.", "sector": "Químicos / industria", "ciudad": "Guayaquil", "clasificacion": "B", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Fertilizantes del Pacífico FERPACIFIC S.A.", "sector": "Fertilizantes", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Grupasa Grupo Papelero Cía. Ltda.", "sector": "Papel / cartón", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Papelera Nacional S.A.", "sector": "Papel", "ciudad": "Marcelino Maridueña", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "In Car Palm Industria Cartonera Palmar S.A.", "sector": "Cartón", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Envases Metalúrgicos ENVAMET S.A.", "sector": "Envases metálicos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Holcim Ecuador S.A.", "sector": "Cemento / agregados", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "UNACEM Ecuador S.A.", "sector": "Cemento", "ciudad": "Guayaquil / nacional", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Novacero S.A.", "sector": "Acero / manufactura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Kubiec S.A.", "sector": "Acero / construcción", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Ideal Alambrec Bekaert S.A.", "sector": "Acero / alambre", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Adelca Acería del Ecuador C.A.", "sector": "Acero", "ciudad": "Guayaquil / nacional", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Agripac S.A.", "sector": "Agroindustria / balanceados", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Empagran S.A.", "sector": "Camarón / balanceados", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Balanceados Nova BALNOVA", "sector": "Balanceados", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Alibaec", "sector": "Balanceados", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Ecuaprotein S.A.", "sector": "Proteínas / alimentos", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Exigranos S.A.", "sector": "Granos", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Olam Ecuador S.A.", "sector": "Commodities / agroindustria", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Crystal Chemical del Ecuador S.A.", "sector": "Agroquímicos", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Eurofert S.A.", "sector": "Fertilizantes", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Repapers Reciclaje del Ecuador S.A.", "sector": "Reciclaje / papel", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Procesadora Nacional de Alimentos C.A. PRONACA", "sector": "Alimentos / balanceados", "ciudad": "Guayaquil / nacional", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industrial Pesquera Santa Priscila S.A.", "sector": "Camarón / acuicultura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Naturisa S.A.", "sector": "Camarón / acuicultura", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Songa C.A.", "sector": "Camarón / procesamiento", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Promarosa Cía. Ltda.", "sector": "Camarón / procesamiento", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Proexpo S.A.", "sector": "Productos del mar", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Empacreci S.A.", "sector": "Alimentos / procesamiento", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Agroarriba S.A.", "sector": "Cacao", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Ingranagro S.A.", "sector": "Agroindustria", "ciudad": "Durán", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Arrocesa S.A.", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Labiza S.A.", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industria Arrocera Sarmiento INASAR", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Portiarroz", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Ecuarrocera S.A.", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Induagrícola Burgos S.A.", "sector": "Arroz / agroindustria", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Arrocera del Trópico ARTROP", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Inarromesa S.A.", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Agroindustria Lombarda", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Piladora Continental", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Agroindustria Arrocera El Cóndor", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Industrial Arrocera La Monarca", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Proarroz", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Piladora Santa Rosa", "sector": "Arroz / molinería", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "DP World Posorja S.A.", "sector": "Puerto / logística", "ciudad": "Posorja", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Contecon Guayaquil S.A.", "sector": "Puerto / logística", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Andipuerto Guayaquil S.A.", "sector": "Puerto / graneles", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Fertisa Terminal Portuario S.A.", "sector": "Puerto / fertilizantes", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Naportec S.A.", "sector": "Puerto / logística", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Terminal Portuario de Guayaquil TPG", "sector": "Puerto / logística", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Trinipuerto S.A.", "sector": "Puerto / graneles", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Almacenera Almacopio S.A.", "sector": "Almacenamiento / logística", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Distrilógico S.A.", "sector": "Logística", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Corporación Favorita C.A. - Centro de Distribución", "sector": "Logística / alimentos", "ciudad": "Guayas", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Corporación El Rosado S.A. - Centro de Distribución", "sector": "Logística / alimentos", "ciudad": "Guayaquil", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "La Fabril S.A.", "sector": "Aceites / alimentos / químicos", "ciudad": "Montecristi", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Inepaca C.A.", "sector": "Pesca / alimentos", "ciudad": "Manta", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Marbelize S.A.", "sector": "Pesca / alimentos", "ciudad": "Manta", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Eurofish S.A.", "sector": "Pesca / alimentos", "ciudad": "Manta", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Tecopesca C.A.", "sector": "Pesca / alimentos", "ciudad": "Manta", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Conservas Isabel Ecuatoriana S.A.", "sector": "Pesca / alimentos", "ciudad": "Manta", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Seafman C.A.", "sector": "Pesca / alimentos", "ciudad": "Manta", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Fishcorp S.A.", "sector": "Pesca / alimentos", "ciudad": "Manta", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Ales C.A.", "sector": "Aceites / alimentos", "ciudad": "Manta", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Novopan del Ecuador S.A.", "sector": "Madera / tableros", "ciudad": "Quito", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Aglomerados Cotopaxi S.A.", "sector": "Madera / tableros", "ciudad": "Latacunga", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Productos Familia Sancela del Ecuador S.A.", "sector": "Papel / higiene", "ciudad": "Quito", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Cartones Nacionales S.A. CARTOPEL", "sector": "Papel / cartón", "ciudad": "Cuenca", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Continental Tire Andina S.A.", "sector": "Llantas / caucho", "ciudad": "Cuenca", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Indurama S.A.", "sector": "Electrodomésticos", "ciudad": "Cuenca", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Graiman Cía. Ltda.", "sector": "Cerámica", "ciudad": "Cuenca", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Cerámica Rialto S.A.", "sector": "Cerámica", "ciudad": "Cuenca", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Italpisos S.A.", "sector": "Cerámica", "ciudad": "Cuenca", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Ecuacerámica S.A.", "sector": "Cerámica", "ciudad": "Riobamba", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Unión Cementera Nacional UCEM S.A.", "sector": "Cemento", "ciudad": "Riobamba", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Novacero S.A. - Planta Lasso", "sector": "Acero", "ciudad": "Lasso", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "General Motors del Ecuador S.A.", "sector": "Automotriz / manufactura", "ciudad": "Quito", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Aymesa S.A.", "sector": "Automotriz / manufactura", "ciudad": "Quito", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Chaide y Chaide S.A.", "sector": "Manufactura / colchones", "ciudad": "Quito", "clasificacion": "A", "servicioRecomendado": "Pesaje industrial; calibración; mantenimiento; neumática; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Danec S.A.", "sector": "Aceites / alimentos", "ciudad": "Sangolquí", "clasificacion": "A", "servicioRecomendado": "Balanzas de proceso/plataforma; calibración; dosificación; mantenimiento", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Moderna Alimentos S.A.", "sector": "Molinería / alimentos", "ciudad": "Quito", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}, {"nombre": "Corporación Superior S.A.", "sector": "Molinería / alimentos", "ciudad": "Quito", "clasificacion": "A", "servicioRecomendado": "Básculas camioneras; calibración; tolvas/compuertas; automatización", "contactoObjetivo": "Jefe/Gerente de Mantenimiento; Jefe de Planta; Instrumentación; Compras", "observaciones": "Prioridad original: A+ (muy alta). Base pública industrial; validar/enriquecer antes de contactar."}];
+
+function empresaFromImportRow(row, creadoEn){
+  return {
+    id:uid(), nombre:row.nombre, razonSocial:row.nombre, ruc:'', ciudad:row.ciudad||'', direccion:'',
+    sector:row.sector||'', clasificacion:row.clasificacion||'C', estadoCliente:'prospecto',
+    fuente:'Prospección BAS', web:'', maps:'', observaciones:row.observaciones||'',
+    servicioRecomendado:row.servicioRecomendado||'', contactoObjetivo:row.contactoObjetivo||'',
+    contactos:[], equipos:[], creadoEn
+  };
+}
+
+function seedData(){
+  const hoy = todayISO();
+  const empresas = IMPORTED_EMPRESAS_RAW.map(row => empresaFromImportRow(row, hoy));
+
+  return {
+    empresas, oportunidades:[], cotizaciones:[], activityLog:[],
+    metas:{empresas:10, contactos:20, llamadas:30, conversaciones:10, visitas:3, cotizaciones:2},
+    correlativoCotizacion:100,
+  };
+}
+function shiftISO(iso,days){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+
+/* ---------- persistencia (localStorage: funciona en cualquier navegador, incluido GitHub Pages) ---------- */
+const STORAGE_KEY = 'bas-crm-data-v1';
+async function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ DATA = JSON.parse(raw); return; }
+  }catch(e){ console.error('No se pudo leer el almacenamiento local', e); }
+  DATA = seedData();
+  persist();
+}
+function scheduleSave(){
+  clearTimeout(SAVE_TIMER);
+  SAVE_TIMER = setTimeout(persist, 350);
+}
+function persist(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); }
+  catch(e){ console.error('No se pudo guardar. El almacenamiento del navegador podría estar lleno.', e); }
+}
+
+/* ---------- helpers de dominio ---------- */
+function empresaById(id){ return DATA.empresas.find(e=>e.id===id); }
+function oportunidadesDe(empresaId){ return DATA.oportunidades.filter(o=>o.empresaId===empresaId); }
+function oportunidadById(id){ return DATA.oportunidades.find(o=>o.id===id); }
+function cotizacionesDe(empresaId){ return DATA.cotizaciones.filter(c=>c.empresaId===empresaId); }
+function logDe(empresaId){ return DATA.activityLog.filter(a=>a.empresaId===empresaId).sort((a,b)=>a.fecha<b.fecha?1:-1); }
+function totalCotizacion(c){ return c.items.reduce((s,i)=>s+(i.cant*i.precio),0); }
+
+function logActivity(empresaId, oportunidadId, tipo, detalle, fecha){
+  DATA.activityLog.push({id:uid(), empresaId, oportunidadId: oportunidadId||null, tipo, detalle, fecha: fecha||todayISO()});
+  scheduleSave();
+}
+
+function weekRange(){
+  const now = new Date();
+  const day = (now.getDay()+6)%7; // lunes=0
+  const monday = new Date(now); monday.setDate(now.getDate()-day);
+  const sunday = new Date(monday); sunday.setDate(monday.getDate()+6);
+  return {start: monday.toISOString().slice(0,10), end: sunday.toISOString().slice(0,10)};
+}
+function countThisWeek(tipo){
+  const {start,end} = weekRange();
+  return DATA.activityLog.filter(a=>a.tipo===tipo && a.fecha>=start && a.fecha<=end).length;
+}
+function empresasNuevasEstaSemana(){
+  const {start,end} = weekRange();
+  return DATA.empresas.filter(e=>e.creadoEn>=start && e.creadoEn<=end).length;
+}
+function contactosNuevosEstaSemana(){
+  const {start,end} = weekRange();
+  let n=0;
+  DATA.empresas.forEach(e=>e.contactos.forEach(c=>{ if(!c.creadoEn) return; if(c.creadoEn>=start && c.creadoEn<=end) n++; }));
+  return n;
+}
+function conversacionesEstaSemana(){
+  const {start,end} = weekRange();
+  return DATA.activityLog.filter(a=>['llamada','whatsapp'].includes(a.tipo) && a.detalle && a.fecha>=start && a.fecha<=end).length;
+}
+function visitasRealizadasEstaSemana(){
+  const {start,end} = weekRange();
+  return DATA.activityLog.filter(a=>a.tipo==='visita' && a.fecha>=start && a.fecha<=end).length;
+}
+function ventasGanadasEstaSemana(){
+  const {start,end} = weekRange();
+  return DATA.oportunidades.filter(o=>o.estado===10 && o.fechaCierre && o.fechaCierre>=start && o.fechaCierre<=end).length;
+}
+
+function pipelineOpen(){ return DATA.oportunidades.filter(o=>![10,11].includes(o.estado)); }
+function conteoEmbudo(){
+  const totalEmpresas = DATA.empresas.length;
+  const contactadas = new Set(DATA.activityLog.filter(a=>['llamada','whatsapp','correo'].includes(a.tipo)).map(a=>a.empresaId)).size;
+  const conversaciones = DATA.oportunidades.filter(o=>o.estado>=3).length;
+  const visitas = DATA.oportunidades.filter(o=>o.estado>=6).length;
+  const cotizaciones = DATA.oportunidades.filter(o=>o.estado>=8).length;
+  const ventas = DATA.oportunidades.filter(o=>o.estado===10).length;
+  return {totalEmpresas, contactadas, conversaciones, visitas, cotizaciones, ventas};
+}
+
+function tareasHoy(){
+  const hoy = todayISO();
+  return pipelineOpen().filter(o=>o.proximaFecha && o.proximaFecha<=hoy)
+    .sort((a,b)=> a.proximaFecha<b.proximaFecha?-1:1);
+}
+function alertas(){
+  const out = [];
+  pipelineOpen().forEach(o=>{
+    const log = DATA.activityLog.filter(a=>a.oportunidadId===o.id).sort((a,b)=>a.fecha<b.fecha?1:-1);
+    const last = log[0];
+    const ref = last ? last.fecha : o.creadoEn;
+    const d = daysBetween(ref);
+    if(d>=7){ out.push({tipo:'danger', text:`${empresaById(o.empresaId)?.nombre||'—'} — ${d} días sin contacto.`}); }
+  });
+  DATA.cotizaciones.filter(c=>c.estado==='Enviada'||c.estado==='En seguimiento').forEach(c=>{
+    const d = daysBetween(c.fechaEnvio||c.fecha);
+    if(d>=5){ out.push({tipo:'warn', text:`Cotización ${c.numero} enviada hace ${d} días sin seguimiento.`}); }
+  });
+  DATA.empresas.forEach(e=>{
+    (e.equipos||[]).forEach(eq=>{
+      if(eq.proximoMantenimiento){
+        const d = -daysBetween(eq.proximoMantenimiento);
+        if(d>=0 && d<=30){ out.push({tipo:'info', text:`${e.nombre}: mantenimiento de ${eq.tipo} en ${d} día(s).`}); }
+      }
+      if(eq.proximaCalibracion){
+        const d = -daysBetween(eq.proximaCalibracion);
+        if(d>=0 && d<=30){ out.push({tipo:'info', text:`${e.nombre}: calibración de ${eq.tipo} vence en ${d} día(s).`}); }
+      }
+    });
+  });
+  return out;
+}
+function sugerirProximaAccion(estado){
+  const map = {1:'Llamada de primer contacto', 2:'Segunda llamada o WhatsApp', 3:'Identificar necesidad / problema técnico',
+    4:'Proponer visita técnica', 5:'Confirmar visita', 6:'Preparar cotización', 7:'Enviar cotización',
+    8:'Llamar para dar seguimiento a la cotización', 9:'Negociar alcance / precio / OC', 12:'Seguimiento mensual'};
+  return map[estado] || 'Definir próxima acción';
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  document.querySelectorAll('.navbtn[data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===VIEW));
+  const view = document.getElementById('view');
+  const titleEl = document.getElementById('topbar-title');
+  const subEl = document.getElementById('topbar-sub');
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-EC',{weekday:'long', day:'numeric', month:'long'});
+
+  if(VIEW==='dashboard'){
+    titleEl.textContent = '¿Qué tengo que hacer hoy?';
+    subEl.textContent = fecha.charAt(0).toUpperCase()+fecha.slice(1);
+    view.innerHTML = renderDashboard();
+    bindDashboard();
+  } else if(VIEW==='empresas'){
+    titleEl.textContent = 'Empresas';
+    subEl.textContent = `${DATA.empresas.length} registradas`;
+    view.innerHTML = renderEmpresas();
+    bindEmpresas();
+  } else if(VIEW==='pipeline'){
+    titleEl.textContent = 'Pipeline comercial';
+    subEl.textContent = `${pipelineOpen().length} oportunidades abiertas`;
+    view.innerHTML = renderPipeline();
+    bindPipeline();
+  } else if(VIEW==='cotizaciones'){
+    titleEl.textContent = 'Cotizaciones';
+    subEl.textContent = `${DATA.cotizaciones.length} registradas`;
+    view.innerHTML = renderCotizaciones();
+    bindCotizaciones();
+  } else if(VIEW==='reportes'){
+    titleEl.textContent = 'Reporte mensual';
+    subEl.textContent = now.toLocaleDateString('es-EC',{month:'long', year:'numeric'});
+    view.innerHTML = renderReportes();
+  } else if(VIEW==='config'){
+    titleEl.textContent = 'Metas semanales';
+    subEl.textContent = 'Ajusta tus objetivos de prospección';
+    view.innerHTML = renderConfig();
+    bindConfig();
+  }
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(){
+  const tareas = tareasHoy();
+  const emb = conteoEmbudo();
+  const alerts = alertas();
+  const m = DATA.metas;
+  const real = {
+    empresas: empresasNuevasEstaSemana(),
+    contactos: contactosNuevosEstaSemana(),
+    llamadas: countThisWeek('llamada'),
+    conversaciones: conversacionesEstaSemana(),
+    visitas: visitasRealizadasEstaSemana(),
+    cotizaciones: countThisWeek('cotizacion'),
+  };
+  const cotizado = pipelineOpen().filter(o=>o.estado>=7).reduce((s,o)=>s+(o.valor||0),0);
+  const negociacion = pipelineOpen().filter(o=>o.estado===9).reduce((s,o)=>s+(o.valor||0),0);
+  const ganado = DATA.oportunidades.filter(o=>o.estado===10).reduce((s,o)=>s+(o.valor||0),0);
+  const perdido = DATA.oportunidades.filter(o=>o.estado===11).reduce((s,o)=>s+(o.valor||0),0);
+
+  const goalRow = (label, real, meta) => {
+    const pct = meta? Math.min(100, Math.round(real/meta*100)) : 0;
+    const color = pct>=100?'var(--green)':pct>=70?'var(--brass)':'var(--red)';
+    return `<div class="goal-row">
+      <div class="goal-label">${label}</div>
+      <div class="goal-bar"><div class="goal-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="goal-num">${real}/${meta} · ${pct}%</div>
+    </div>`;
+  };
+
+  return `
+  <div class="grid g-4" style="margin-bottom:4px;">
+    <div class="kpi"><div class="label">Llamadas pendientes</div><div class="value">${tareas.length}</div><div class="foot">tareas de hoy</div></div>
+    <div class="kpi"><div class="label">Cotizado en pipeline</div><div class="value">${fmtUSD(cotizado)}</div><div class="foot">${pipelineOpen().filter(o=>o.estado>=7).length} oportunidades</div></div>
+    <div class="kpi"><div class="label">En negociación</div><div class="value">${fmtUSD(negociacion)}</div><div class="foot">${pipelineOpen().filter(o=>o.estado===9).length} oportunidades</div></div>
+    <div class="kpi"><div class="label">Ganado / Perdido</div><div class="value">${fmtUSD(ganado)} <small>/ ${fmtUSD(perdido)}</small></div><div class="foot">acumulado</div></div>
+  </div>
+
+  <div class="grid g-3" style="align-items:start; margin-top:18px;">
+    <div class="card" style="grid-column:span 2;">
+      <div class="card-title">Tareas de hoy <span class="mono" style="color:var(--muted); font-weight:600; font-size:12px;">${tareas.length}</span></div>
+      <div id="tareas-list">
+        ${tareas.length ? tareas.map(t=>{
+          const emp = empresaById(t.empresaId);
+          const overdue = t.proximaFecha < todayISO();
+          return `<div class="task-row ${overdue?'overdue':''}" data-op="${t.id}">
+            <div class="task-check" data-check="${t.id}"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:600; font-size:13px;">${escapeHtml(emp?.nombre||'—')} <span style="font-weight:400; color:var(--muted);">— ${escapeHtml(t.proximaAccion)}</span></div>
+              <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">${estadoById(t.estado).label} · ${overdue?'<span style="color:var(--red); font-weight:700;">Venció '+fmtDate(t.proximaFecha)+'</span>':fmtDate(t.proximaFecha)}</div>
+            </div>
+            <div class="tag ${overdue?'tag-cotizacion':'tag-seguimiento'}">${overdue?'Atrasada':'Hoy'}</div>
+          </div>`;
+        }).join('') : `<div class="empty-state"><svg viewBox="0 0 24 24" stroke-width="1.7" fill="none"><path d="M20 6 9 17l-5-5"/></svg><div>No tienes tareas pendientes hoy. Buen trabajo.</div></div>`}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Alertas</div>
+      ${alerts.length ? alerts.slice(0,6).map(a=>`<div class="alert-row ${a.tipo}">⚠️ ${escapeHtml(a.text)}</div>`).join('') : '<div class="empty-state" style="padding:20px 6px;">Sin alertas activas.</div>'}
+    </div>
+  </div>
+
+  <div class="section-label">¿Cómo va mi semana?</div>
+  <div class="grid g-2">
+    <div class="card">
+      ${goalRow('Empresas nuevas', real.empresas, m.empresas)}
+      ${goalRow('Contactos nuevos', real.contactos, m.contactos)}
+      ${goalRow('Llamadas', real.llamadas, m.llamadas)}
+      ${goalRow('Conversaciones', real.conversaciones, m.conversaciones)}
+      ${goalRow('Visitas', real.visitas, m.visitas)}
+      ${goalRow('Cotizaciones', real.cotizaciones, m.cotizaciones)}
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">Embudo comercial</div>
+      <div class="funnel">
+        <div class="funnel-step"><div class="n">${emb.totalEmpresas}</div><div class="l">Empresas</div></div>
+        <div class="funnel-step"><div class="n">${emb.contactadas}</div><div class="l">Contactadas</div></div>
+        <div class="funnel-step"><div class="n">${emb.conversaciones}</div><div class="l">Conversac.</div></div>
+        <div class="funnel-step"><div class="n">${emb.visitas}</div><div class="l">Visitas</div></div>
+        <div class="funnel-step"><div class="n">${emb.cotizaciones}</div><div class="l">Cotizac.</div></div>
+        <div class="funnel-step"><div class="n">${emb.ventas}</div><div class="l">Ventas</div></div>
+      </div>
+      <div style="margin-top:18px; display:flex; gap:20px; font-size:12px; color:var(--muted);">
+        <div>Contacto efectivo: <b style="color:var(--ink);">${emb.contactadas? Math.round(emb.conversaciones/emb.contactadas*100):0}%</b></div>
+        <div>Conv. → visita: <b style="color:var(--ink);">${emb.conversaciones? Math.round(emb.visitas/emb.conversaciones*100):0}%</b></div>
+        <div>Visita → cotiz.: <b style="color:var(--ink);">${emb.visitas? Math.round(emb.cotizaciones/emb.visitas*100):0}%</b></div>
+        <div>Cierre: <b style="color:var(--ink);">${emb.cotizaciones? Math.round(emb.ventas/emb.cotizaciones*100):0}%</b></div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+function bindDashboard(){
+  document.querySelectorAll('[data-check]').forEach(el=>{
+    el.onclick = () => openQuickAction(el.dataset.check);
+  });
+  document.querySelectorAll('.task-row').forEach(el=>{
+    el.onclick = (e) => { if(e.target.closest('[data-check]')) return; const op = oportunidadById(el.dataset.op); openEmpresaDrawer(op.empresaId,'pipeline'); };
+  });
+}
+
+/* ---------- EMPRESAS ---------- */
+function renderEmpresas(){
+  let list = DATA.empresas.slice();
+  if(FILTER_CLASIF!=='todas'){
+    if(FILTER_CLASIF==='cliente') list = list.filter(e=>e.estadoCliente==='cliente');
+    else list = list.filter(e=>e.clasificacion===FILTER_CLASIF);
+  }
+  if(SEARCH_Q){
+    const q = SEARCH_Q.toLowerCase();
+    list = list.filter(e => e.nombre.toLowerCase().includes(q) || (e.ruc||'').includes(q) || e.contactos.some(c=>(c.nombre+' '+c.apellido).toLowerCase().includes(q)));
+  }
+  return `
+  <div class="filters">
+    <button class="chip ${FILTER_CLASIF==='todas'?'active':''}" data-f="todas">Todas (${DATA.empresas.length})</button>
+    <button class="chip ${FILTER_CLASIF==='A'?'active':''}" data-f="A">A · Alta prioridad</button>
+    <button class="chip ${FILTER_CLASIF==='B'?'active':''}" data-f="B">B · Prioridad media</button>
+    <button class="chip ${FILTER_CLASIF==='C'?'active':''}" data-f="C">C · Prospecto</button>
+    <button class="chip ${FILTER_CLASIF==='cliente'?'active':''}" data-f="cliente">Clientes activos</button>
+  </div>
+  <div class="card" style="padding:0;">
+    <table class="table">
+      <thead><tr><th>Empresa</th><th>Sector</th><th>Ciudad</th><th>Clasif.</th><th>Estado</th><th>Contacto principal</th><th>Próxima acción</th></tr></thead>
+      <tbody>
+        ${list.map(e=>{
+          const contacto = e.contactos.find(c=>c.principal) || e.contactos[0];
+          const ops = oportunidadesDe(e.id).filter(o=>![10,11].includes(o.estado)).sort((a,b)=>a.proximaFecha<b.proximaFecha?-1:1);
+          const next = ops[0];
+          return `<tr class="clickable" data-emp="${e.id}">
+            <td><div class="company-cell"><div class="avatar-sq">${initials(e.nombre)}</div><div><div class="company-name">${escapeHtml(e.nombre)}</div><div class="company-sub">RUC ${e.ruc||'—'}</div></div></div></td>
+            <td>${escapeHtml(e.sector)}</td>
+            <td>${escapeHtml(e.ciudad)}</td>
+            <td><span class="pill pill-${e.clasificacion.toLowerCase()}">${e.clasificacion}</span></td>
+            <td>${e.estadoCliente==='cliente'?'<span class="pill pill-cliente">Cliente activo</span>':e.estadoCliente==='inactivo'?'<span class="pill pill-inactivo">Inactivo</span>':'<span class="pill pill-c">Prospecto</span>'}</td>
+            <td>${contacto? escapeHtml(contacto.nombre+' '+contacto.apellido)+'<div class="company-sub">'+escapeHtml(contacto.cargo)+'</div>' : '<span style="color:var(--muted);">Sin contacto</span>'}</td>
+            <td>${next? escapeHtml(next.proximaAccion)+'<div class="company-sub '+(next.proximaFecha<todayISO()?'':'')+'" style="'+(next.proximaFecha<todayISO()?'color:var(--red); font-weight:600;':'')+'">'+fmtDate(next.proximaFecha)+'</div>' : '<span style="color:var(--muted);">—</span>'}</td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="7"><div class="empty-state">No hay empresas con este filtro.</div></td></tr>`}
+      </tbody>
+    </table>
+  </div>
+  `;
+}
+function bindEmpresas(){
+  document.querySelectorAll('.chip[data-f]').forEach(el=> el.onclick = () => { FILTER_CLASIF = el.dataset.f; render(); });
+  document.querySelectorAll('tr[data-emp]').forEach(el=> el.onclick = () => openEmpresaDrawer(el.dataset.emp,'general'));
+}
+
+/* ---------- PIPELINE (kanban) ---------- */
+function renderPipeline(){
+  const cols = ESTADOS.filter(e=>e.id<=9 || e.id===12);
+  return `<div id="kanban">
+    ${cols.map(col=>{
+      const ops = DATA.oportunidades.filter(o=>o.estado===col.id);
+      return `<div class="kcol">
+        <div class="kcol-head"><span class="t" style="color:${col.color}">${col.label}</span><span class="n">${ops.length}</span></div>
+        <div class="kcol-body">
+          ${ops.map(o=>{
+            const emp = empresaById(o.empresaId);
+            const overdue = o.proximaFecha && o.proximaFecha < todayISO();
+            return `<div class="kcard ${overdue?'overdue':''}" data-op="${o.id}" style="border-left-color:${col.color}">
+              <div class="name">${escapeHtml(emp?.nombre||'—')}</div>
+              <div class="meta">${escapeHtml(o.servicio)}</div>
+              ${o.valor? `<div class="val">${fmtUSD(o.valor)}</div>`:''}
+              <div class="meta">${o.proximaFecha? '📅 '+fmtDate(o.proximaFecha):''}</div>
+            </div>`;
+          }).join('') || ''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function bindPipeline(){
+  document.querySelectorAll('.kcard[data-op]').forEach(el=>{
+    el.onclick = () => { const op = oportunidadById(el.dataset.op); openEmpresaDrawer(op.empresaId,'pipeline'); };
+  });
+}
+
+/* ---------- COTIZACIONES ---------- */
+function renderCotizaciones(){
+  const list = DATA.cotizaciones.slice().sort((a,b)=> a.fecha<b.fecha?1:-1);
+  return `<div class="card" style="padding:0;">
+    <table class="table">
+      <thead><tr><th>N°</th><th>Empresa</th><th>Servicio</th><th>Valor</th><th>Estado</th><th>Enviada</th><th>Próx. seguimiento</th></tr></thead>
+      <tbody>
+        ${list.map(c=>{
+          const emp = empresaById(c.empresaId);
+          const total = totalCotizacion(c);
+          return `<tr class="clickable" data-cot="${c.id}">
+            <td class="mono">${c.numero}</td>
+            <td><div class="company-name">${escapeHtml(emp?.nombre||'—')}</div></td>
+            <td>${escapeHtml(c.servicio)}</td>
+            <td class="mono" style="font-weight:600;">${fmtUSD(total)}</td>
+            <td><span class="tag tag-cotizacion">${c.estado}</span></td>
+            <td>${fmtDate(c.fechaEnvio)}</td>
+            <td>${c.proximoSeguimiento? fmtDate(c.proximoSeguimiento):'—'}</td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="7"><div class="empty-state">Aún no hay cotizaciones.</div></td></tr>`}
+      </tbody>
+    </table>
+  </div>`;
+}
+function bindCotizaciones(){
+  document.querySelectorAll('tr[data-cot]').forEach(el=> el.onclick = () => openQuoteView(el.dataset.cot));
+}
+
+/* ---------- REPORTES ---------- */
+function renderReportes(){
+  const cotizadoUSD = DATA.oportunidades.filter(o=>o.estado>=7).reduce((s,o)=>s+(o.valor||0),0);
+  const vendidoUSD = DATA.oportunidades.filter(o=>o.estado===10).reduce((s,o)=>s+(o.valor||0),0);
+  const ventas = DATA.oportunidades.filter(o=>o.estado===10);
+  const ticket = ventas.length? vendidoUSD/ventas.length : 0;
+  const emb = conteoEmbudo();
+  const estancadas = pipelineOpen().filter(o=>{
+    const log = DATA.activityLog.filter(a=>a.oportunidadId===o.id).sort((a,b)=>a.fecha<b.fecha?1:-1);
+    const ref = log[0]?log[0].fecha:o.creadoEn;
+    return daysBetween(ref) >= 7;
+  });
+  const top = pipelineOpen().slice().sort((a,b)=>(b.valor||0)-(a.valor||0)).slice(0,10);
+
+  return `
+  <div class="grid g-4">
+    <div class="kpi"><div class="label">USD Cotizado</div><div class="value">${fmtUSD(cotizadoUSD)}</div><div class="foot">${DATA.oportunidades.filter(o=>o.estado>=7).length} oportunidades</div></div>
+    <div class="kpi"><div class="label">USD Vendido</div><div class="value">${fmtUSD(vendidoUSD)}</div><div class="foot">${ventas.length} ventas cerradas</div></div>
+    <div class="kpi"><div class="label">Ticket promedio</div><div class="value">${fmtUSD(ticket)}</div><div class="foot">por venta ganada</div></div>
+    <div class="kpi"><div class="label">Clientes nuevos</div><div class="value">${DATA.empresas.filter(e=>e.estadoCliente==='cliente').length}</div><div class="foot">cartera activa</div></div>
+  </div>
+
+  <div class="grid g-2" style="margin-top:18px;">
+    <div class="card">
+      <div class="card-title">Conversión del embudo</div>
+      <div class="goal-row"><div class="goal-label">Contacto → conversación</div><div class="goal-bar"><div class="goal-bar-fill" style="width:${emb.contactadas?Math.min(100,Math.round(emb.conversaciones/emb.contactadas*100)):0}%; background:var(--steel)"></div></div><div class="goal-num">${emb.contactadas?Math.round(emb.conversaciones/emb.contactadas*100):0}%</div></div>
+      <div class="goal-row"><div class="goal-label">Conversación → visita</div><div class="goal-bar"><div class="goal-bar-fill" style="width:${emb.conversaciones?Math.min(100,Math.round(emb.visitas/emb.conversaciones*100)):0}%; background:var(--steel)"></div></div><div class="goal-num">${emb.conversaciones?Math.round(emb.visitas/emb.conversaciones*100):0}%</div></div>
+      <div class="goal-row"><div class="goal-label">Visita → cotización</div><div class="goal-bar"><div class="goal-bar-fill" style="width:${emb.visitas?Math.min(100,Math.round(emb.cotizaciones/emb.visitas*100)):0}%; background:var(--steel)"></div></div><div class="goal-num">${emb.visitas?Math.round(emb.cotizaciones/emb.visitas*100):0}%</div></div>
+      <div class="goal-row"><div class="goal-label">Cotización → venta</div><div class="goal-bar"><div class="goal-bar-fill" style="width:${emb.cotizaciones?Math.min(100,Math.round(emb.ventas/emb.cotizaciones*100)):0}%; background:var(--green)"></div></div><div class="goal-num">${emb.cotizaciones?Math.round(emb.ventas/emb.cotizaciones*100):0}%</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Oportunidades estancadas <span class="mono" style="font-size:12px; color:var(--red);">${estancadas.length}</span></div>
+      ${estancadas.length? estancadas.slice(0,6).map(o=>`<div class="mini-list-item"><div><div class="name">${escapeHtml(empresaById(o.empresaId)?.nombre||'—')}</div><div class="sub">${estadoById(o.estado).label}</div></div><div class="tag tag-cotizacion">7+ días</div></div>`).join('') : '<div class="empty-state" style="padding:16px;">Ninguna oportunidad estancada.</div>'}
+    </div>
+  </div>
+
+  <div class="section-label">Top oportunidades abiertas</div>
+  <div class="card" style="padding:0;">
+    <table class="table">
+      <thead><tr><th>Empresa</th><th>Servicio</th><th>Estado</th><th>Valor</th></tr></thead>
+      <tbody>
+      ${top.map(o=>`<tr><td>${escapeHtml(empresaById(o.empresaId)?.nombre||'—')}</td><td>${escapeHtml(o.servicio)}</td><td>${estadoById(o.estado).label}</td><td class="mono" style="font-weight:600;">${fmtUSD(o.valor)}</td></tr>`).join('') || `<tr><td colspan="4"><div class="empty-state">Sin oportunidades.</div></td></tr>`}
+      </tbody>
+    </table>
+  </div>
+  `;
+}
+
+/* ---------- CONFIG (metas) ---------- */
+function renderConfig(){
+  const m = DATA.metas;
+  const fld = (k,label) => `<div class="field"><label>${label}</label><input type="number" id="meta-${k}" value="${m[k]}"></div>`;
+  return `<div class="card" style="max-width:420px;">
+    <div class="card-title">Metas semanales</div>
+    ${fld('empresas','Empresas nuevas investigadas')}
+    ${fld('contactos','Contactos nuevos identificados')}
+    ${fld('llamadas','Llamadas')}
+    ${fld('conversaciones','Conversaciones reales')}
+    ${fld('visitas','Visitas técnicas')}
+    ${fld('cotizaciones','Cotizaciones')}
+    <button class="btn btn-primary" id="save-metas" style="width:100%; justify-content:center; margin-top:6px;">Guardar metas</button>
+  </div>`;
+}
+function bindConfig(){
+  document.getElementById('save-metas').onclick = () => {
+    ['empresas','contactos','llamadas','conversaciones','visitas','cotizaciones'].forEach(k=>{
+      DATA.metas[k] = Number(document.getElementById('meta-'+k).value)||0;
+    });
+    scheduleSave(); VIEW='dashboard'; render();
+  };
+}
+
+/* ============================================================
+   DRAWER — Ficha de empresa
+   ============================================================ */
+let DRAWER_TAB = 'general';
+let DRAWER_EMPRESA = null;
+
+function openEmpresaDrawer(empresaId, tab){
+  DRAWER_EMPRESA = empresaId; DRAWER_TAB = tab || 'general';
+  renderDrawer();
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-backdrop').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+}
+function renderDrawer(){
+  const e = empresaById(DRAWER_EMPRESA);
+  if(!e) return;
+  const tabs = [['general','General'],['contactos','Contactos'],['equipos','Equipos'],['pipeline','Pipeline'],['historial','Historial']];
+  document.getElementById('drawer').innerHTML = `
+    <div class="drawer-head">
+      <div class="top">
+        <div>
+          <h2>${escapeHtml(e.nombre)}</h2>
+          <div class="meta">${escapeHtml(e.sector)} · ${escapeHtml(e.ciudad)} · RUC ${e.ruc||'—'}</div>
+        </div>
+        <button class="drawer-close" id="drawer-close-btn">✕</button>
+      </div>
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+        <span class="pill pill-${e.clasificacion.toLowerCase()}">${e.clasificacion}</span>
+        ${e.estadoCliente==='cliente'?'<span class="pill pill-cliente">Cliente activo</span>':''}
+        <button class="btn btn-sm btn-brass no-print" id="edit-empresa-btn" style="margin-left:auto;">Editar ficha</button>
+      </div>
+      <div class="drawer-tabs">
+        ${tabs.map(([k,l])=>`<button class="dtab ${DRAWER_TAB===k?'active':''}" data-tab="${k}">${l}</button>`).join('')}
+      </div>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+  `;
+  document.getElementById('drawer-close-btn').onclick = closeDrawer;
+  document.getElementById('edit-empresa-btn').onclick = () => openEmpresaModal(e.id);
+  document.querySelectorAll('.dtab').forEach(t=> t.onclick = () => { DRAWER_TAB = t.dataset.tab; renderDrawer(); });
+  document.getElementById('drawer-body').innerHTML = drawerBodyFor(DRAWER_TAB, e);
+  bindDrawerBody(e);
+}
+function drawerBodyFor(tab, e){
+  if(tab==='general') return `
+    <div class="field"><label>Razón social</label><div style="font-size:13.5px;">${escapeHtml(e.razonSocial||'—')}</div></div>
+    <div class="field-row">
+      <div class="field"><label>Ciudad</label><div>${escapeHtml(e.ciudad||'—')}</div></div>
+      <div class="field"><label>Sector</label><div>${escapeHtml(e.sector||'—')}</div></div>
+    </div>
+    <div class="field"><label>Dirección</label><div>${escapeHtml(e.direccion||'—')}</div></div>
+    <div class="field-row">
+      <div class="field"><label>Fuente</label><div>${escapeHtml(e.fuente||'—')}</div></div>
+      <div class="field"><label>Estado</label><div>${e.estadoCliente==='cliente'?'Cliente activo':e.estadoCliente==='inactivo'?'Cliente inactivo':'Prospecto'}</div></div>
+    </div>
+    ${e.servicioRecomendado? `<div class="field"><label>Servicio BAS recomendado</label><div>${escapeHtml(e.servicioRecomendado)}</div></div>` : ''}
+    ${e.contactoObjetivo? `<div class="field"><label>Contacto objetivo (cargos a buscar)</label><div>${escapeHtml(e.contactoObjetivo)}</div></div>` : ''}
+    <div class="field"><label>Observaciones</label><div>${escapeHtml(e.observaciones||'—')}</div></div>
+  `;
+  if(tab==='contactos') return `
+    <button class="btn btn-sm btn-primary no-print" id="add-contacto-btn" style="margin-bottom:12px;">+ Nuevo contacto</button>
+    ${e.contactos.length? e.contactos.map(c=>`
+      <div class="mini-list-item">
+        <div>
+          <div class="name">${escapeHtml(c.nombre+' '+c.apellido)} ${c.principal?'<span class="tag tag-oc">Principal</span>':''}</div>
+          <div class="sub">${escapeHtml(c.cargo)} · ${escapeHtml(c.telefono||'')} · ${escapeHtml(c.correo||'')}</div>
+        </div>
+        <button class="icon-btn" data-del-contacto="${c.id}"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+      </div>
+    `).join('') : `<div class="empty-state">Aún no hay contactos registrados.</div>`}
+  `;
+  if(tab==='equipos') return `
+    <button class="btn btn-sm btn-primary no-print" id="add-equipo-btn" style="margin-bottom:12px;">+ Nuevo equipo</button>
+    ${e.equipos.length? e.equipos.map(eq=>`
+      <div class="mini-list-item">
+        <div>
+          <div class="name">${escapeHtml(eq.tipo)} — ${escapeHtml(eq.marca||'s/marca')}</div>
+          <div class="sub">Cap. ${escapeHtml(eq.capacidad||'—')} · Cant. ${eq.cantidad||1} · ${escapeHtml(eq.ubicacion||'')}${eq.proximoMantenimiento? ' · Próx. mant. '+fmtDate(eq.proximoMantenimiento):''}</div>
+        </div>
+        <button class="icon-btn" data-del-equipo="${eq.id}"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+      </div>
+    `).join('') : `<div class="empty-state">Aún no hay equipos registrados.</div>`}
+  `;
+  if(tab==='pipeline'){
+    const ops = oportunidadesDe(e.id);
+    return `
+    <button class="btn btn-sm btn-primary no-print" id="add-op-btn" style="margin-bottom:12px;">+ Nueva oportunidad</button>
+    ${ops.length? ops.map(o=>`
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="font-weight:700; font-size:13.5px;">${escapeHtml(o.servicio)}</div>
+            <div class="sub" style="font-size:11.5px; color:var(--muted); margin-top:2px;">Creada ${fmtDate(o.creadoEn)} ${o.valor?' · '+fmtUSD(o.valor):''}</div>
+          </div>
+          <span class="tag tag-seguimiento" style="background:${estadoById(o.estado).color}22; color:${estadoById(o.estado).color};">${estadoById(o.estado).label}</span>
+        </div>
+        <div class="field-row" style="margin-top:10px;">
+          <div class="field" style="margin-bottom:0;">
+            <label>Cambiar estado</label>
+            <select data-op-estado="${o.id}">
+              ${ESTADOS.map(s=>`<option value="${s.id}" ${s.id===o.estado?'selected':''}>${s.label}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Valor (USD)</label>
+            <input type="number" data-op-valor="${o.id}" value="${o.valor||0}">
+          </div>
+        </div>
+        <div class="field-row" style="margin-top:10px;">
+          <div class="field" style="margin-bottom:0;"><label>Próxima acción</label><input type="text" data-op-accion="${o.id}" value="${escapeHtml(o.proximaAccion||'')}"></div>
+          <div class="field" style="margin-bottom:0;"><label>Fecha</label><input type="date" data-op-fecha="${o.id}" value="${o.proximaFecha||''}"></div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="btn btn-sm" data-log-op="${o.id}" data-tipo="llamada">📞 Registrar llamada</button>
+          <button class="btn btn-sm" data-log-op="${o.id}" data-tipo="whatsapp">💬 WhatsApp</button>
+          <button class="btn btn-sm" data-cotizar-op="${o.id}">Generar cotización</button>
+        </div>
+      </div>
+    `).join('') : `<div class="empty-state">Sin oportunidades. Crea la primera.</div>`}
+    `;
+  }
+  if(tab==='historial'){
+    const log = logDe(e.id);
+    return `<div class="timeline">
+      ${log.length? log.map(l=>{
+        const t = TIPOS_ACTIVIDAD.find(x=>x.k===l.tipo);
+        return `<div class="tl-item"><div class="tl-date">${fmtDateFull(l.fecha)} <span class="tag ${t?t.tag:'tag-seguimiento'}">${t?t.label:l.tipo}</span></div><div class="tl-text">${escapeHtml(l.detalle)}</div></div>`;
+      }).join('') : `<div class="empty-state">Sin historial todavía.</div>`}
+    </div>`;
+  }
+  return '';
+}
+function bindDrawerBody(e){
+  const addContacto = document.getElementById('add-contacto-btn');
+  if(addContacto) addContacto.onclick = () => openContactoModal(e.id);
+  document.querySelectorAll('[data-del-contacto]').forEach(b=> b.onclick = () => {
+    e.contactos = e.contactos.filter(c=>c.id!==b.dataset.delContacto); scheduleSave(); renderDrawer();
+  });
+  const addEquipo = document.getElementById('add-equipo-btn');
+  if(addEquipo) addEquipo.onclick = () => openEquipoModal(e.id);
+  document.querySelectorAll('[data-del-equipo]').forEach(b=> b.onclick = () => {
+    e.equipos = e.equipos.filter(eq=>eq.id!==b.dataset.delEquipo); scheduleSave(); renderDrawer();
+  });
+  const addOp = document.getElementById('add-op-btn');
+  if(addOp) addOp.onclick = () => openOportunidadModal(e.id);
+  document.querySelectorAll('[data-op-estado]').forEach(sel=> sel.onchange = () => {
+    const op = oportunidadById(sel.dataset.opEstado);
+    const nuevo = Number(sel.value);
+    if(nuevo===11){ openPerdidaModal(op.id); return; }
+    if(nuevo===10){ op.fechaCierre = todayISO(); e.estadoCliente='cliente'; }
+    op.estado = nuevo;
+    if(!op.proximaAccion || op.proximaAccion===sugerirProximaAccion(op.estado)){}
+    logActivity(e.id, op.id, 'seguimiento', `Estado actualizado a "${estadoById(nuevo).label}"`, todayISO());
+    scheduleSave(); renderDrawer(); render();
+  });
+  document.querySelectorAll('[data-op-valor]').forEach(inp=> inp.onchange = () => {
+    const op = oportunidadById(inp.dataset.opValor); op.valor = Number(inp.value)||0; scheduleSave();
+  });
+  document.querySelectorAll('[data-op-accion]').forEach(inp=> inp.onchange = () => {
+    const op = oportunidadById(inp.dataset.opAccion); op.proximaAccion = inp.value; scheduleSave();
+  });
+  document.querySelectorAll('[data-op-fecha]').forEach(inp=> inp.onchange = () => {
+    const op = oportunidadById(inp.dataset.opFecha); op.proximaFecha = inp.value; scheduleSave();
+  });
+  document.querySelectorAll('[data-log-op]').forEach(btn=> btn.onclick = () => {
+    const op = oportunidadById(btn.dataset.logOp);
+    logActivity(e.id, op.id, btn.dataset.tipo, `${btn.dataset.tipo==='llamada'?'Llamada':'WhatsApp'} registrado`, todayISO());
+    render(); renderDrawer();
+  });
+  document.querySelectorAll('[data-cotizar-op]').forEach(btn=> btn.onclick = () => {
+    openCotizacionModal(e.id, btn.dataset.cotizarOp);
+  });
+}
+
+/* ============================================================
+   TAREA RÁPIDA (marcar tarea de hoy realizada)
+   ============================================================ */
+function openQuickAction(opId){
+  const op = oportunidadById(opId);
+  const e = empresaById(op.empresaId);
+  openModal(`Registrar actividad — ${escapeHtml(e.nombre)}`, `
+    <div class="field"><label>Tipo de contacto realizado</label>
+      <select id="qa-tipo">${TIPOS_ACTIVIDAD.map(t=>`<option value="${t.k}">${t.label}</option>`).join('')}</select>
+    </div>
+    <div class="field"><label>Nota</label><textarea id="qa-nota" placeholder="¿Qué pasó?">${escapeHtml(op.proximaAccion)}</textarea></div>
+    <div class="field-row">
+      <div class="field"><label>Próxima acción</label><input id="qa-siguiente" value="${escapeHtml(sugerirProximaAccion(op.estado))}"></div>
+      <div class="field"><label>Próxima fecha</label><input type="date" id="qa-fecha" value="${shiftISO(todayISO(),3)}"></div>
+    </div>
+  `, () => {
+    const tipo = document.getElementById('qa-tipo').value;
+    const nota = document.getElementById('qa-nota').value;
+    logActivity(e.id, op.id, tipo, nota||'Actividad registrada', todayISO());
+    op.proximaAccion = document.getElementById('qa-siguiente').value;
+    op.proximaFecha = document.getElementById('qa-fecha').value;
+    scheduleSave(); closeModal(); render();
+  }, 'Registrar y programar siguiente');
+}
+
+/* ============================================================
+   MODAL genérico
+   ============================================================ */
+function openModal(title, bodyHtml, onSave, saveLabel){
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-head"><h3>${title}</h3><button class="icon-btn" id="modal-close">✕</button></div>
+    <div class="modal-body">${bodyHtml}</div>
+    <div class="modal-foot"><button class="btn" id="modal-cancel">Cancelar</button><button class="btn btn-primary" id="modal-save">${saveLabel||'Guardar'}</button></div>
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-close').onclick = closeModal;
+  document.getElementById('modal-cancel').onclick = closeModal;
+  document.getElementById('modal-save').onclick = onSave;
+}
+function closeModal(){ document.getElementById('modal-backdrop').classList.remove('open'); }
+
+/* ---- Nueva / Editar empresa ---- */
+function openEmpresaModal(empresaId){
+  const e = empresaId ? empresaById(empresaId) : null;
+  openModal(e? 'Editar empresa' : 'Nueva empresa', `
+    <div class="field"><label>Nombre comercial *</label><input id="f-nombre" value="${e?escapeHtml(e.nombre):''}"></div>
+    <div class="field-row">
+      <div class="field"><label>Razón social</label><input id="f-razon" value="${e?escapeHtml(e.razonSocial||''):''}"></div>
+      <div class="field"><label>RUC</label><input id="f-ruc" value="${e?escapeHtml(e.ruc||''):''}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Ciudad</label><input id="f-ciudad" value="${e?escapeHtml(e.ciudad||''):''}" placeholder="Guayaquil, Durán, Samborondón…"></div>
+      <div class="field"><label>Sector</label><select id="f-sector">${SECTORES.map(s=>`<option ${e&&e.sector===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="field"><label>Dirección</label><input id="f-direccion" value="${e?escapeHtml(e.direccion||''):''}"></div>
+    <div class="field-row">
+      <div class="field"><label>Clasificación</label>
+        <select id="f-clasif">
+          <option value="A" ${e&&e.clasificacion==='A'?'selected':''}>A — Alta prioridad</option>
+          <option value="B" ${e&&e.clasificacion==='B'?'selected':''}>B — Prioridad media</option>
+          <option value="C" ${(!e||e.clasificacion==='C')?'selected':''}>C — Prospecto</option>
+        </select>
+      </div>
+      <div class="field"><label>Fuente</label><select id="f-fuente">${FUENTES.map(f=>`<option ${e&&e.fuente===f?'selected':''}>${f}</option>`).join('')}</select></div>
+    </div>
+    <div class="field"><label>Observaciones</label><textarea id="f-obs">${e?escapeHtml(e.observaciones||''):''}</textarea></div>
+  `, () => {
+    const nombre = document.getElementById('f-nombre').value.trim();
+    if(!nombre){ alert('El nombre comercial es obligatorio.'); return; }
+    if(e){
+      e.nombre=nombre; e.razonSocial=document.getElementById('f-razon').value; e.ruc=document.getElementById('f-ruc').value;
+      e.ciudad=document.getElementById('f-ciudad').value; e.sector=document.getElementById('f-sector').value;
+      e.direccion=document.getElementById('f-direccion').value; e.clasificacion=document.getElementById('f-clasif').value;
+      e.fuente=document.getElementById('f-fuente').value; e.observaciones=document.getElementById('f-obs').value;
+    } else {
+      const ne = {id:uid(), nombre, razonSocial:document.getElementById('f-razon').value, ruc:document.getElementById('f-ruc').value,
+        ciudad:document.getElementById('f-ciudad').value, direccion:document.getElementById('f-direccion').value,
+        sector:document.getElementById('f-sector').value, clasificacion:document.getElementById('f-clasif').value,
+        estadoCliente:'prospecto', fuente:document.getElementById('f-fuente').value, web:'', maps:'',
+        observaciones:document.getElementById('f-obs').value, contactos:[], equipos:[], creadoEn:todayISO()};
+      DATA.empresas.push(ne);
+    }
+    scheduleSave(); closeModal(); render(); if(DRAWER_EMPRESA) renderDrawer();
+  });
+}
+
+/* ---- Nuevo contacto ---- */
+function openContactoModal(empresaId){
+  const e = empresaById(empresaId);
+  openModal('Nuevo contacto', `
+    <div class="field-row">
+      <div class="field"><label>Nombre *</label><input id="f-cnombre"></div>
+      <div class="field"><label>Apellido</label><input id="f-capellido"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Cargo</label><select id="f-ccargo">${CARGOS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Área</label><input id="f-carea"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Teléfono / WhatsApp</label><input id="f-ctel"></div>
+      <div class="field"><label>Correo</label><input id="f-ccorreo"></div>
+    </div>
+    <div class="field"><label><input type="checkbox" id="f-cprincipal" style="width:auto; margin-right:6px;">Marcar como contacto principal</label></div>
+  `, () => {
+    const nombre = document.getElementById('f-cnombre').value.trim();
+    if(!nombre){ alert('El nombre es obligatorio.'); return; }
+    const principal = document.getElementById('f-cprincipal').checked;
+    if(principal) e.contactos.forEach(c=>c.principal=false);
+    e.contactos.push({id:uid(), nombre, apellido:document.getElementById('f-capellido').value, cargo:document.getElementById('f-ccargo').value,
+      area:document.getElementById('f-carea').value, telefono:document.getElementById('f-ctel').value, whatsapp:document.getElementById('f-ctel').value,
+      correo:document.getElementById('f-ccorreo').value, principal: principal || e.contactos.length===0, observaciones:'', creadoEn:todayISO()});
+    scheduleSave(); closeModal(); renderDrawer();
+  });
+}
+
+/* ---- Nuevo equipo ---- */
+function openEquipoModal(empresaId){
+  const e = empresaById(empresaId);
+  openModal('Nuevo equipo', `
+    <div class="field-row">
+      <div class="field"><label>Tipo *</label><select id="f-etipo">${TIPOS_EQUIPO.map(t=>`<option>${t}</option>`).join('')}</select></div>
+      <div class="field"><label>Marca</label><input id="f-emarca"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Capacidad</label><input id="f-ecap" placeholder="80 ton, 500 kg…"></div>
+      <div class="field"><label>Cantidad</label><input type="number" id="f-ecant" value="1"></div>
+    </div>
+    <div class="field"><label>Ubicación</label><input id="f-eubic"></div>
+    <div class="field-row">
+      <div class="field"><label>Próximo mantenimiento</label><input type="date" id="f-emant"></div>
+      <div class="field"><label>Próxima calibración</label><input type="date" id="f-ecalib"></div>
+    </div>
+  `, () => {
+    e.equipos.push({id:uid(), tipo:document.getElementById('f-etipo').value, marca:document.getElementById('f-emarca').value,
+      capacidad:document.getElementById('f-ecap').value, cantidad:Number(document.getElementById('f-ecant').value)||1,
+      ubicacion:document.getElementById('f-eubic').value, ultimaIntervencion:'',
+      proximoMantenimiento:document.getElementById('f-emant').value, proximaCalibracion:document.getElementById('f-ecalib').value});
+    scheduleSave(); closeModal(); renderDrawer();
+  });
+}
+
+/* ---- Nueva oportunidad ---- */
+function openOportunidadModal(empresaId){
+  const e = empresaById(empresaId);
+  openModal('Nueva oportunidad', `
+    <div class="field"><label>Servicio *</label><input id="f-oserv" placeholder="Ej: Mantenimiento báscula camionera"></div>
+    <div class="field-row">
+      <div class="field"><label>Estado inicial</label><select id="f-oestado">${ESTADOS.filter(s=>s.id<=5||s.id===12).map(s=>`<option value="${s.id}">${s.label}</option>`).join('')}</select></div>
+      <div class="field"><label>Valor estimado (USD)</label><input type="number" id="f-oval" value="0"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Próxima acción</label><input id="f-oaccion" value="Llamada de primer contacto"></div>
+      <div class="field"><label>Fecha</label><input type="date" id="f-ofecha" value="${todayISO()}"></div>
+    </div>
+  `, () => {
+    const servicio = document.getElementById('f-oserv').value.trim();
+    if(!servicio){ alert('Describe el servicio.'); return; }
+    const op = {id:uid(), empresaId:e.id, servicio, estado:Number(document.getElementById('f-oestado').value),
+      valor:Number(document.getElementById('f-oval').value)||0, proximaAccion:document.getElementById('f-oaccion').value,
+      proximaFecha:document.getElementById('f-ofecha').value, creadoEn:todayISO(), motivoPerdida:null};
+    DATA.oportunidades.push(op);
+    logActivity(e.id, op.id, 'seguimiento', `Oportunidad creada: ${servicio}`, todayISO());
+    scheduleSave(); closeModal(); renderDrawer(); render();
+  });
+}
+
+/* ---- Motivo de pérdida ---- */
+function openPerdidaModal(opId){
+  const op = oportunidadById(opId);
+  const e = empresaById(op.empresaId);
+  openModal('Motivo de pérdida', `
+    <div class="field"><label>¿Por qué se perdió esta oportunidad? *</label>
+      <select id="f-motivo">${MOTIVOS_PERDIDA.map(m=>`<option>${m}</option>`).join('')}</select>
+    </div>
+    <div class="field"><label>Notas</label><textarea id="f-motivo-notas"></textarea></div>
+  `, () => {
+    op.estado = 11; op.motivoPerdida = document.getElementById('f-motivo').value; op.fechaCierre = todayISO();
+    logActivity(e.id, op.id, 'seguimiento', `Oportunidad perdida — ${op.motivoPerdida}. ${document.getElementById('f-motivo-notas').value}`, todayISO());
+    scheduleSave(); closeModal(); renderDrawer(); render();
+  }, 'Confirmar pérdida');
+}
+
+/* ---- Cotización ---- */
+function openCotizacionModal(empresaId, oportunidadId){
+  const e = empresaById(empresaId);
+  const op = oportunidadId ? oportunidadById(oportunidadId) : null;
+  const contacto = e.contactos.find(c=>c.principal) || e.contactos[0];
+  openModal('Generar cotización', `
+    <div class="field"><label>Servicio / descripción</label><input id="f-qserv" value="${op?escapeHtml(op.servicio):''}"></div>
+    <div class="field"><label>Ítem 1</label><input id="f-qitem1" placeholder="Descripción del ítem"></div>
+    <div class="field-row">
+      <div class="field"><label>Cantidad</label><input type="number" id="f-qcant1" value="1"></div>
+      <div class="field"><label>Precio unitario (USD)</label><input type="number" id="f-qprecio1" value="${op&&op.valor?op.valor:0}"></div>
+    </div>
+    <div class="field"><label>Contacto destinatario</label>
+      <select id="f-qcontacto">${e.contactos.map(c=>`<option value="${c.id}" ${contacto&&contacto.id===c.id?'selected':''}>${escapeHtml(c.nombre+' '+c.apellido)}</option>`).join('') || '<option value="">Sin contactos registrados</option>'}</select>
+    </div>
+  `, () => {
+    const servicio = document.getElementById('f-qserv').value.trim() || (op?op.servicio:'Servicio BAS Electric');
+    const item1desc = document.getElementById('f-qitem1').value.trim() || servicio;
+    const cant = Number(document.getElementById('f-qcant1').value)||1;
+    const precio = Number(document.getElementById('f-qprecio1').value)||0;
+    const numero = 'BAS-2026-' + (DATA.correlativoCotizacion++);
+    const cot = {id:uid(), numero, empresaId:e.id, oportunidadId: op?op.id:null, contactoId:document.getElementById('f-qcontacto').value,
+      servicio, items:[{desc:item1desc, cant, precio}], fecha:todayISO(), fechaEnvio:todayISO(), estado:'Enviada',
+      proximoSeguimiento: shiftISO(todayISO(),5), observaciones:''};
+    DATA.cotizaciones.push(cot);
+    if(op){ op.estado = 8; op.valor = cant*precio; op.proximaAccion='Llamar para dar seguimiento a la cotización'; op.proximaFecha=shiftISO(todayISO(),5); }
+    logActivity(e.id, op?op.id:null, 'cotizacion', `Cotización ${numero} generada — ${fmtUSD(cant*precio)}`, todayISO());
+    scheduleSave(); closeModal(); renderDrawer(); render();
+    openQuoteView(cot.id);
+  }, 'Generar');
+}
+
+/* ---- Vista de cotización (documento) ---- */
+function openQuoteView(cotId){
+  const c = DATA.cotizaciones.find(x=>x.id===cotId);
+  const e = empresaById(c.empresaId);
+  const contacto = e.contactos.find(x=>x.id===c.contactoId) || e.contactos[0];
+  const total = totalCotizacion(c);
+  const statusColors = {'Preparando':'var(--muted)','Enviada':'var(--steel)','En seguimiento':'var(--amber)','Negociación':'#8B4BA8','Aprobada':'var(--green)','Rechazada':'var(--red)','Vencida':'var(--red)'};
+
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-head"><h3>Cotización ${c.numero}</h3><button class="icon-btn" id="modal-close">✕</button></div>
+    <div class="modal-body" style="padding:0; background:var(--bg);">
+      <div style="padding:18px;">
+        <div class="quote-doc" id="quote-printable">
+          <div class="quote-head">
+            <div class="quote-brand">
+              <div class="mark"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAT30lEQVR4nO2dZ1xURwLAZ9mlLl0UREAFRQFFETUiJQpWQI1isCT+jCSWFM87zZ3GaM4WkxgT705zmkSTnEZjCWJJYhQ0kRjABopCABVR6VKW3tn7sBduw+6bfe/NK/OW+X9S3uzMvJn/Tn9vZcoR8wCBwBYTsTNAkDZEIAISRCACEkQgAhJEIAISRCACEkQgAhJEIAISRCACEkQgAhJEIAISRCACEkQgAhJEIAISCrEzgAsO/uFMP1KdeYmPnEiLnigQC1fox9PTrOopAnElDaOEeoJMxiyQYNLQyYCxymSEArHzhkUFM0qoK7CRmSQzmjPR9KuT1yrEJBuCYQwC0akzUWoL24xxiIQFMlg9WNWNtHJLH0kKBK8MzGtC0pnXRWICGU3pG82NSEkgqkKXUHHrIvWbkoZAUi9lg0j3BnEXSLolywIp3izWAvXMzSZp3TWmAkmrEPlAKiWA43kgqZQdr+i9X9F393TBrgXSLaOepk43MC8QjAQiDQ8VOJcMLgJh/j3DATyLCIsxEJ5Fgxu6ZYLDkEh8gYg99MHQIZG7sG73T9ShCT7lJppApOFBBJMCFKcLw+TmJQ0m3ZkIAhF7uAIHh4QWiNjDLaI7JPIsjNiDjrhlKKhA+MwdjIxuJSlkIyScQMQeXhHLIYEEIvYIgCgOCSEQsUcwhHeId4GIPQIjsEOCDqKJPcIgZDnzK5DoW30EwHMt8CgQ6bxERLCOjC+BiD2iI4xDQoyBiD1iIUDJ8yIQGfrgCR/1wr1ApPPCCr47Mn67MGIPDvBaCxwLRDov/OG2jnhsgUjzgw/81QWXAvWEt9pKF+0a4bAR4uw1v6TzQsTMVDHW3ztwmGegn9eg/n1tra3sbZQ21pZtbR1NzS2Nza2q2vrCssrC0sqi0sqc/MI7eY8Kip6q1Wp2yTn4h3PyJeflPdGQnCV9tXncyCH0o1Kr1W3tHa2tbTX1TVU1dYWllQWF5dn3n6Tdzs3JL2JdfFRsfD127dI5BoMdOv3zq3/fx1Winu4ucXMjFs2a0MveRveq3NzEwtzUwQ70c3b0G+yhfamhsTkzt+DKzZxf039LvZXb0NgMT6g68xLn33NuHuuhP3VnKhCEkqfVCRfSPjt+4f6jEk4ilMlkd7//V3/X3gZD1jc0DQxf3tTSipiiqUK+dlnMmy/PUsjliFG1d3QEPLf64ZMyeDDOF1m4H0QLNvrp29vhtRempyd8/K+NS60szNEjDB7lQ8ceAIC10nJG+BjE5Jyd7JOPbF+3bA66PQAAhVxuqjAcD+e1w4FA4o5+TExkcTER5w6809vRFjGqhTNCmQQOQ0nLzkZ5Zu/64d79USJBB73uOG6BxJp8Bfp5ndyzTm7C/nYszc1mTx5HP/zEccNdnOxZJ3dwx6puAxrB4LaOxH+5AlcE+HquWhzN+uNRE0fbKC3ph5ebmMRGhrBLK/LZwIggf3afxQ1UgbBa+1m1eAbrRmhhNOMuicVHNGz+0wJ2H+QKDteE8Pq5p4amFuegxd3+qLQ0d+/be2royNVLZumd6HbRy94mONAn+XoW03T79LKLGM+4SRjm7THcu/+dvEeMPjXU083Hyw0SQK1Wn79y6/ufbtzOefi4pKKhsbmtvcPOxsrORtmnl90wb49hgz1G+gwM8PVE6bK5AkkgYYbPDU0tOfmFOfmFJ86lXDq41c2lFyRw2Bg/FgLNiwxhVxkLZ4S99dEhRh+ZEjIScrWsQjXvzztv3L3f7e+VqrpKVV3+k9K0W7mav9jbKiOC/KeEjJwZPpZR56sLyqIiZwoL0H8Vl1dt2n0UHobdwJb1lCp2ejBT857xHwy5uuLve3Xt0YuqtiH+fOryjXs9w5cv3fDJlZvZnZ0MllW5qi/x20BGnL+SAQ/Qp5cd0zh9B7lDptNlFaqrt/Oorjo72YcHDWeUHCSHlaq6pJRMRrEBAJpaWr/57pdpL2/hakGVEewFEmX4XF1T39HZCQnAYm/jhRnPQq6eSrp64scUSACmQ+nejpQCVVTXcr45A4GTobTEWiB7WyW8yyirVDGKUG5iEhsZDAkQfyH1dNJVSO8QHT7GmskQxMLcjOqSm4uThbkp/ahwQGICTQ4eCQ+QkZXPKMKJ44b37e1AdbXkaXVqRm7J0+quoasuluZmc5isQFbX1lNdUlqar1/xPP2ocIClQKL0X85O9ptWzocEaGvvOPvTdUZxwofPpxKvavqUk4lp0EgY7IE8raqFXF29ZOaRj9eM8vWkHyEK6L2YBFogS3Mz74GuKxdFpR77AL7ZeeBEYkU1rHq6obSyiJ44GhIg/kKq5h+nEtMgvVjwKB+Pvk40EzU4yZoZPib5yPbMs//YtT4udnqwp7sLzZhFAa+FRKWlef0tAxN1KnIfFm3ac4zRR2ZPegayjV9UVtU1/yqtUKXdyh0/aqjekDKZbH5U6I79CXQSvXzt7t9emW0wmKe7i6e7y9LYKQCA6pr69Oz8m1kPrt7KS8nIqWtoopOQMOAlEGsycwti3vignmHJwvuvhMQ07TlR/IVUKoEAAAui6Qr0y43s+49KBvXvSz+fDnbWEUH+mu2zjs7OW789TEq5feyHK3kPi+lHwhNsujCs9r8qVXVb9hyb8OKGkqfVjD7o5tIrJNAXEuDk7/2XBvhcbPAA1zHDB9FJt7NTTVM1vchNTAL9vNYunZOe8PHlw+/GTg+WyWSsYwPIwyAJjIHgFJVVVqrqWBTiguhQExPKTz0prbh+5w+DldIKVWpGDiRC+svZR84mn0q8SjMwhEA/ry/eW5ly7P2gAMqmkW8kL5D/kAH/3PDKjfid8OZElwVR0P7rQprumh58LhYzNYjOmUANKzbt+/XmbzQDwxnu3f/c/o2vvTCdk9iYInmBNAx0dz776dux02FLgtoE+nl5D3SFBIg/n6r7x1PQXszRzmZa6CiaGahvaJqx4t0vT16kGR6OQi7f8dfFr8RO5iQ2RjAWCKsBkDamCvmnW1+j2ZjDu5uCovKbWQ90/15mqBdbwGRTtrWtfeWWzycv2ZSRzWzxk4oP//bSSJ+BLD6IMgzCaxam9zyQqUJuZ6P0HeQe+WzgS7MnQvYNTBXyfZtXjJ6zpq29A5KKqUI+d9p4SIAE6q4q/kJqcKAP1dVpoQEOdtbVNZRrzbqkZuSELlwfEugbNzdiRvgYS+qNDoOYKuTrV8yNXfUh6xhYIIEurK29o6K6Nvl61rqdB8fFrr1XAJu7enm4LJo1AR7h1JAA+MG0kxcoBTp98RqkFzMzVcydClOTiis3s+Pe2u0e9vKsV7f/8z/fZWTnt3fAvgNURD4b6OUh6MKjBATSpqCoPPbPO+GF+6IhgeD918MnZZA+paxClZIBG/yiPK3R3NJ2MTXz7V1fhy5c3y8kLmrZ1m3/Pn4xNdPgE4PaTHyG2fESRCQmEADgXkHx2UuwDa+x/oPtbJRUV+1tlVNDAyAfh0+1ALR9AgCMGT6Ikzagoanl8rWs9z87OevV7f1CX45atvXLkxfpPMoYFMDNc5s0wWsMRJPk69nwR3BGDB1AdbB17tTx5mawIxNr4matiZuFkr2FM8K2fnIcJYZutHd0XL6Wdfla1va9337x3srQ0bAFi37OjhwmbRDptUAAgFJDi86ufSgLcQGTnXN2zI8KRVwdpqLkafXzqz4sq1BBwjjawYZ3nMNMIEzm8DLqFWQNttb6Z2qe7i7P+HvzkKM/0N+1d/AoypkaIvUNTWcuXYMEYHckjfVMXpItEKSB0dBOMY1HfB6ZPoxOCDGluLwKcrWpGfWVD4yQpEBh0EEAAKBK36k/mUw2P4rls6RMmT15HNWKzl9feW7LqoUGvwMQ3FxgZ4/KKmtYx8wC6QnkPdA1CnoKDACg9y0nQQFDBvTrw0+mumOjtKTKpIOt9eolM7N+2H1g+xtjoY/46MXJwRZ+gjb/SSnTOFGQmEAD+vU5tutN+Ln6hsbmrHtPdP/O+klkdsCTM1XI50WGXDq4Nfvcnnf/8uLoYbSOgri7OMXvWetgZw0Jk87wVDgiEpjGK+Rye1ulj5db1ITR8K0MDeeS03VXGi3MTedMYXD0HZ2I8f59etmVG+pQPPo6rVocvWpxdFVNXXpW/s2sBxlZ+UXlVVWquqqa+samFgsLs769HfwGe0wLDYidHgxfg1Cr1RdTb3N6HwbASyCUI61d7Dt6XvePURNG21pbQT61fd+32/d9yyihBdGhn297neqq3MRkXmTI7kPf04zN0c5m0vgRk8aPYJSHbiRfzy4qgw2xOUdiXZhBEhLT9D6CswDaoajV6sNnLjNN63TSNfgh2gXRvK85dWPngVMCp2hUAt0rKP7Ttv26f+/taDsJ+vKNX25kPyp+yjS5xuaWhCTYwUL/IQOEfIvUtz+m/HT1jmDJaTAege7kPYpatk3vUYrY6SHw9xAeOv0zu0S/NtRuCTZyv5v3+I2tnwuTljbGIFBLa9uur86EL9pItcIGXz+sb2g6nQRb24WQkp7zsLAcEmBeVPcXx3Ty8PT71cy8yKVbmT6UwgnSFuhxScWH+0/5z1i18R9HqHaqfbzcRgwdAIkk/kJaY3MLuwyo1epvvkuGBHBxsp847g/nKzbvPhrzxgeHz16uqWtgl6g2jc0t7+49MXXJ5qqaOvTYWIDXLIyKzk51W3t7fWNzZXVdUXnlg8elmTkFqbdyf3tQaPCzBrcvDHZDcI6cTX5reQxk93ThjLCklP9PrdvaO85fyTh/JcPMVBE2xi9sjF9w4NBRvl70D+RreFhYfvT7X/afSITvrfINsxeNY7KZanxYmpsF+Hl6D3D18nDx8ujb37W3rbWVjdJCaWVhYWba1t7R1NxSqaorLq+696jkdk5BSnpO9n09i6UosKtcabRARk9TS2tKek5KOuzEPp5IewxEEB0iEAEJZgLx9JtTBNFhPbolLRABCSIQAQkiEAEJIhABCSIQAQkiEAEJxgKRmbzxgbJDhfVWRkx0xGtLYvVeWv7mtvsPn2iHuZ2Vt/qdj1jEoMFaaRU1KSRojH9/N1crK4vauobS8opr6Xd/uPhrZZUq4auPbamftwcAHDz+XX1Do3ZaarW6san50ZOSpOSrZy8kd/7+Cw2QDMPzAEldRLAWSDCG+Qx6Z82yXg7//xULR3tbR3tbX2/PyuqaH5KusIhTJpMprSx9h3j6DvF0c3X+5AsDryDmIw8CIA2B9LYuXMXQr2+f995eaWVpAQDIuJPzxZHT9x4+tlFaubk6hwUFtrS0AgBmv7S6K/zeHeu9vfoDAD7ae0i7XmOiI7TTsrK0WPR8VOysKQCAmVPDDhw+1dxCeeqITh7whI1A2r9fj/JbZZgQt3CWpuYKi8vWbdvd3t4OAKhS1VapajOz77GOtrGp+ZuEHzUCKRSKXo52RSWUZxd5ygMdEI/o9PRZmEIuDwr833n742cSNTXHFV2nzNRqtYr6xCCveeAbaXRhI/y8L8Z/2vXf4tKni17fwEkMDg625r8/xF7wmMsXv1tZWsx/bqrm36k3MhsaKQ8s85cHAZCGQNJCW1a1Wv3zrzd2fXpY3CzxB0uBBB4G8TeIrq6ubWlp1TQAAzxcs3L1vN0XEUvq33MRLA9UoJ9R7uljoPaOjtSb//uZ0tiZkxUKDprk21l5k+aueGnlO7kPHslksnGj/deuXCJwHgSjpwsEAPjymzONTc0AADdX5/c3rPQZPNDUVGFva+M3xOv1uNiI0LEs4lSr1U+Ky7bs/Ky1rQ0AEDx2RNBo2KOxfORBGNjLLmQv1m0IDADYsec/539KMRiGTgyFxWVvb9/zzpplDva2AcOH7nl/nXawj/Yy+1l4bUrLK06cSXwhJhIA8OqS56/fyqaaYfGXBwicPGNDWiAAAMjMvrdk1ab9XyfczXlQV9/Y0dFZrarNzsv/6ujZq+l3UWI+Ev+jZhein0ufmCjY1iF/eeAVZs+FdaPbZqrUVxR7FFzVHVILRIwxDlDqkXRhBCRQBSLHg6QIh4+okxaIgATHApFGCH+4rSMOBCJDaemCXnfcd2GkEcIZzmuHG4FIIyRFOKk1XgbRpBHCEz7qhTOBSCMkLbiqLy5bILImhDM8vZ6Qx3Ug4hA+8FcXHAtEOjL84baO+F2JJo0QDvBaC9wL1E1w4pC48H3khpcWiHRkeMJHvQixmUoaIbEQoOT5Eoh0ZKIjzHlRHlsg4pCICHbamN8ujAyGcIDXWhD0QBlphIRByHLmXSDSkQmMwI/KCNECEYcEQ/gHrQTqwohDAiDKY3rCjYGIQ7wi1kOegg6iiUM8IeIjwiI/1kMcQkfcMhRaIN0vB3EIBd3SE3jtTYQWiDjEFaLbA8TqwohD6OBgD0B8vQs65AUx7MCn3EQWCGDzTZIKuBWX+C9XIN0ZfXCzB+AgECAO0QNDewAOXVgXeqXBoYxEB+eSwUggDXh+z0QE8wLBTiCA9xdOSCRRDliMgbqht4x62qhIEvYAPFugLqRSiNwirbvGWiBA3fBgW6AoSPFmcRdIgxRLlhHSvUFpCKRBuqUMQeo3JSWBgKGhtFQKHRjRjUhMIA2SLn1JZ14XSQqkweDEHqvKkFZu6SNhgbqgs0QkSvVgmzEOMQaBNNBfaeS1zjDJhmAYj0BdsFuzZlGdgiWEM0YoUBdY7X4YmTddSOkHgpki+muHjVUabYxZIG0Ek6knSKNNTxFIG652+3uaK3rpiQLphdjADhzPAxEkBBGIgAQRiIAEEYiABBGIgAQRiIAEEYiABBGIgAQRiIAEEYiABBGIgAQRiIAEEYiAxH8BlTpWHqmQ0CwAAAAASUVORK5CYII=" alt="BAS Electric" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
+              <div class="txt"><div>BAS ELECTRIC IND SAS</div><div>Sistemas de pesaje · Automatización industrial</div></div>
+            </div>
+            <div class="quote-num"><div class="n">${c.numero}</div><div class="d">Fecha: ${fmtDateFull(c.fecha)}</div></div>
+          </div>
+          <div class="status-strip" style="background:${statusColors[c.estado]}18; color:${statusColors[c.estado]};">● ${c.estado}</div>
+          <div class="quote-body">
+            <div class="quote-parties">
+              <div class="p"><div class="h">Cliente</div><div class="l" style="font-weight:700;">${escapeHtml(e.razonSocial||e.nombre)}</div><div class="l">RUC ${e.ruc||'—'}</div><div class="l">${escapeHtml(e.direccion||e.ciudad)}</div></div>
+              <div class="p"><div class="h">Atención a</div><div class="l" style="font-weight:700;">${contacto?escapeHtml(contacto.nombre+' '+contacto.apellido):'—'}</div><div class="l">${contacto?escapeHtml(contacto.cargo):''}</div><div class="l">${contacto?escapeHtml(contacto.correo||contacto.telefono||''):''}</div></div>
+            </div>
+            <table class="quote-table">
+              <thead><tr><th>Descripción</th><th class="r">Cant.</th><th class="r">P. Unit.</th><th class="r">Total</th></tr></thead>
+              <tbody>
+                ${c.items.map(i=>`<tr><td>${escapeHtml(i.desc)}</td><td class="r">${i.cant}</td><td class="r">${fmtUSD(i.precio)}</td><td class="r" style="font-weight:600;">${fmtUSD(i.cant*i.precio)}</td></tr>`).join('')}
+              </tbody>
+            </table>
+            <div class="quote-totals">
+              <div class="row"><span>Subtotal</span><span>${fmtUSD(total)}</span></div>
+              <div class="row"><span>IVA (15%)</span><span>${fmtUSD(total*0.15)}</span></div>
+              <div class="row total"><span>Total</span><span>${fmtUSD(total*1.15)}</span></div>
+            </div>
+            ${c.observaciones?`<div style="margin-top:16px; font-size:12.5px; color:var(--muted);"><b>Observaciones:</b> ${escapeHtml(c.observaciones)}</div>`:''}
+          </div>
+          <div class="quote-foot"><span>Validez de la oferta: 15 días</span><span>BAS Electric Ind SAS · Guayaquil, Ecuador</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot no-print">
+      <label style="margin-right:auto; font-size:12.5px; display:flex; align-items:center; gap:6px;">Estado:
+        <select id="q-estado" style="padding:6px 8px; border-radius:6px; border:1px solid var(--border);">
+          ${['Preparando','Enviada','En seguimiento','Negociación','Aprobada','Rechazada','Vencida'].map(s=>`<option ${s===c.estado?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </label>
+      <button class="btn" id="q-print">Imprimir / PDF</button>
+      <button class="btn btn-primary" id="modal-close2">Cerrar</button>
+    </div>
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-close').onclick = closeModal;
+  document.getElementById('modal-close2').onclick = closeModal;
+  document.getElementById('q-print').onclick = () => window.print();
+  document.getElementById('q-estado').onchange = (ev) => {
+    c.estado = ev.target.value;
+    if(c.estado==='Aprobada' && c.oportunidadId){ const op=oportunidadById(c.oportunidadId); if(op){op.estado=10; op.fechaCierre=todayISO(); empresaById(c.empresaId).estadoCliente='cliente'; logActivity(c.empresaId, op.id, 'oc', `Cotización ${c.numero} aprobada — venta ganada`, todayISO());}}
+    scheduleSave(); render();
+  };
+}
+
+/* ============================================================
+   IMPORTAR CSV
+   ============================================================ */
+function parseCSV(text){
+  // Parser CSV simple con soporte de comillas y comas dentro de campos
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i++; } else { inQuotes=false; } }
+      else field += c;
+    } else {
+      if(c==='"') inQuotes = true;
+      else if(c===','){ row.push(field); field=''; }
+      else if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  if(!rows.length) return [];
+  const headers = rows[0].map(h=>h.trim());
+  return rows.slice(1).filter(r=>r.some(v=>v && v.trim())).map(r=>{
+    const obj = {};
+    headers.forEach((h,idx)=> obj[h] = (r[idx]||'').trim());
+    return obj;
+  });
+}
+function pick(obj, keys){
+  for(const k of keys){ if(obj[k] !== undefined && obj[k] !== '') return obj[k]; }
+  return '';
+}
+function mapClasificacion(v){
+  v = (v||'').trim().toUpperCase();
+  if(v==='A+' || v==='A') return 'A';
+  if(v==='B') return 'B';
+  if(v==='C') return 'C';
+  return 'C';
+}
+function openImportModal(){
+  openModal('Importar CSV de empresas', `
+    <div class="field">
+      <label>Selecciona el archivo CSV</label>
+      <input type="file" id="f-csv-file" accept=".csv,text/csv">
+    </div>
+    <div style="font-size:12px; color:var(--muted); line-height:1.5;">
+      Reconoce columnas como: <b>Empresa</b>, <b>Sector</b>, <b>Ciudad/Zona</b>, <b>Prioridad</b> (A+/A/B/C),
+      <b>Servicio BAS recomendado</b>, <b>Contacto objetivo</b>, <b>Nombre contacto</b>, <b>Cargo</b>, <b>Teléfono</b>,
+      <b>WhatsApp</b>, <b>Email</b>, <b>RUC</b>, <b>Dirección</b>, <b>Fuente/nota</b>.<br>
+      Las empresas cuyo nombre ya exista en el CRM se omiten automáticamente.
+    </div>
+    <div id="import-summary" style="margin-top:12px; font-size:13px;"></div>
+  `, () => {
+    const file = document.getElementById('f-csv-file').files[0];
+    if(!file){ alert('Selecciona un archivo CSV.'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const rows = parseCSV(ev.target.result);
+      const existingNames = new Set(DATA.empresas.map(e=>e.nombre.trim().toLowerCase()));
+      let imported = 0, omitted = 0;
+      rows.forEach(r=>{
+        const nombre = pick(r,['Empresa','Nombre','Nombre comercial']).trim();
+        if(!nombre){ return; }
+        if(existingNames.has(nombre.toLowerCase())){ omitted++; return; }
+        const nombreContacto = pick(r,['Nombre contacto']);
+        const contactos = [];
+        if(nombreContacto){
+          contactos.push({id:uid(), nombre:nombreContacto, apellido:'', cargo:pick(r,['Cargo']),
+            area:'', telefono:pick(r,['Teléfono','Telefono']), whatsapp:pick(r,['WhatsApp']),
+            correo:pick(r,['Email','Correo']), principal:true, observaciones:'', creadoEn:todayISO()});
+        }
+        const ne = {
+          id:uid(), nombre, razonSocial:nombre, ruc:pick(r,['RUC']),
+          ciudad:pick(r,['Ciudad/Zona','Ciudad']), direccion:pick(r,['Dirección','Direccion']),
+          sector:pick(r,['Sector']), clasificacion:mapClasificacion(pick(r,['Prioridad','Clasificación','Clasificacion'])),
+          estadoCliente:'prospecto', fuente:'Prospección BAS', web:'', maps:'',
+          observaciones:pick(r,['Fuente/nota','Observaciones']),
+          servicioRecomendado:pick(r,['Servicio BAS recomendado','Servicio recomendado']),
+          contactoObjetivo:pick(r,['Contacto objetivo']),
+          contactos, equipos:[], creadoEn:todayISO()
+        };
+        DATA.empresas.push(ne);
+        existingNames.add(nombre.toLowerCase());
+        imported++;
+      });
+      scheduleSave();
+      document.getElementById('import-summary').innerHTML =
+        `<b style="color:var(--green);">${imported} empresas importadas.</b>${omitted? ' '+omitted+' omitidas por estar duplicadas.':''}`;
+      if(imported){ VIEW='empresas'; render(); }
+    };
+    reader.readAsText(file, 'UTF-8');
+  }, 'Importar');
+}
+
+/* ============================================================
+   Init / eventos globales
+   ============================================================ */
+document.querySelectorAll('.navbtn[data-view]').forEach(b=> b.onclick = () => { VIEW=b.dataset.view; render(); });
+document.getElementById('btn-new-empresa').onclick = () => openEmpresaModal(null);
+document.getElementById('btn-import-csv').onclick = () => openImportModal();
+document.getElementById('drawer-backdrop').onclick = closeDrawer;
+document.getElementById('modal-backdrop').addEventListener('click', (e)=>{ if(e.target.id==='modal-backdrop') closeModal(); });
+let searchTimer;
+document.getElementById('topbar-search').addEventListener('input', (e)=>{
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(()=>{ SEARCH_Q = e.target.value; if(VIEW!=='empresas'){VIEW='empresas';} render(); }, 200);
+});
+
+(async function init(){
+  await loadData();
+  render();
+})();
+
+if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
