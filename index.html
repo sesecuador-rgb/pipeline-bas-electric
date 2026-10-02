@@ -412,6 +412,7 @@ const TIPOS_ACTIVIDAD = [
 let DATA = null; // {empresas:[], activityLog:[], cotizaciones:[], metas:{}}
 let VIEW = 'dashboard';
 let FILTER_CLASIF = 'todas';
+let FILTER_CIUDAD = 'todas';
 let SEARCH_Q = '';
 let SAVE_TIMER = null;
 
@@ -717,10 +718,14 @@ function renderEmpresas(){
     if(FILTER_CLASIF==='cliente') list = list.filter(e=>e.estadoCliente==='cliente');
     else list = list.filter(e=>e.clasificacion===FILTER_CLASIF);
   }
+  if(FILTER_CIUDAD!=='todas'){
+    list = list.filter(e=>(e.ciudad||'—')===FILTER_CIUDAD);
+  }
   if(SEARCH_Q){
     const q = SEARCH_Q.toLowerCase();
     list = list.filter(e => e.nombre.toLowerCase().includes(q) || (e.ruc||'').includes(q) || e.contactos.some(c=>(c.nombre+' '+c.apellido).toLowerCase().includes(q)));
   }
+  const ciudades = [...new Set(DATA.empresas.map(e=>e.ciudad||'—'))].sort((a,b)=>a.localeCompare(b));
   return `
   <div class="filters">
     <button class="chip ${FILTER_CLASIF==='todas'?'active':''}" data-f="todas">Todas (${DATA.empresas.length})</button>
@@ -728,6 +733,10 @@ function renderEmpresas(){
     <button class="chip ${FILTER_CLASIF==='B'?'active':''}" data-f="B">B · Prioridad media</button>
     <button class="chip ${FILTER_CLASIF==='C'?'active':''}" data-f="C">C · Prospecto</button>
     <button class="chip ${FILTER_CLASIF==='cliente'?'active':''}" data-f="cliente">Clientes activos</button>
+    <select id="filtro-ciudad" style="margin-left:auto; padding:7px 10px; border-radius:8px; border:1px solid var(--line,#d8dde0); background:#fff; font-size:13px; color:var(--ink);">
+      <option value="todas" ${FILTER_CIUDAD==='todas'?'selected':''}>Todas las ciudades</option>
+      ${ciudades.map(c=>`<option value="${escapeHtml(c)}" ${FILTER_CIUDAD===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}
+    </select>
   </div>
   <div class="card" style="padding:0;">
     <table class="table">
@@ -754,6 +763,8 @@ function renderEmpresas(){
 }
 function bindEmpresas(){
   document.querySelectorAll('.chip[data-f]').forEach(el=> el.onclick = () => { FILTER_CLASIF = el.dataset.f; render(); });
+  const selCiudad = document.getElementById('filtro-ciudad');
+  if(selCiudad) selCiudad.onchange = () => { FILTER_CIUDAD = selCiudad.value; render(); };
   document.querySelectorAll('tr[data-emp]').forEach(el=> el.onclick = () => openEmpresaDrawer(el.dataset.emp,'general'));
 }
 
