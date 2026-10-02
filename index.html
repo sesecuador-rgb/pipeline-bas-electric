@@ -920,6 +920,7 @@ function renderDrawer(){
         <span class="pill pill-${e.clasificacion.toLowerCase()}">${e.clasificacion}</span>
         ${e.estadoCliente==='cliente'?'<span class="pill pill-cliente">Cliente activo</span>':''}
         <button class="btn btn-sm btn-brass no-print" id="edit-empresa-btn" style="margin-left:auto;">Editar ficha</button>
+        <button class="btn btn-sm btn-danger no-print" id="delete-empresa-btn" style="background:rgba(179,58,46,0.15); border-color:rgba(179,58,46,0.4);">Eliminar empresa</button>
       </div>
       <div class="drawer-tabs">
         ${tabs.map(([k,l])=>`<button class="dtab ${DRAWER_TAB===k?'active':''}" data-tab="${k}">${l}</button>`).join('')}
@@ -929,6 +930,7 @@ function renderDrawer(){
   `;
   document.getElementById('drawer-close-btn').onclick = closeDrawer;
   document.getElementById('edit-empresa-btn').onclick = () => openEmpresaModal(e.id);
+  document.getElementById('delete-empresa-btn').onclick = () => openDeleteEmpresaModal(e.id);
   document.querySelectorAll('.dtab').forEach(t=> t.onclick = () => { DRAWER_TAB = t.dataset.tab; renderDrawer(); });
   document.getElementById('drawer-body').innerHTML = drawerBodyFor(DRAWER_TAB, e);
   bindDrawerBody(e);
@@ -1148,6 +1150,40 @@ function openEmpresaModal(empresaId){
     }
     scheduleSave(); closeModal(); render(); if(DRAWER_EMPRESA) renderDrawer();
   });
+}
+
+/* ---- Eliminar empresa ---- */
+function openDeleteEmpresaModal(empresaId){
+  const e = empresaById(empresaId);
+  const ops = oportunidadesDe(e.id);
+  const cots = cotizacionesDe(e.id);
+  openModal('Eliminar empresa', `
+    <p style="font-size:14px; line-height:1.6;">
+      ¿Seguro que quieres eliminar <b>${escapeHtml(e.nombre)}</b> del CRM?
+    </p>
+    <p style="font-size:13px; color:var(--muted); margin-top:10px;">
+      Esto también eliminará permanentemente:
+    </p>
+    <ul style="font-size:13px; color:var(--muted); margin:6px 0 0 18px; line-height:1.7;">
+      <li>${e.contactos.length} contacto(s)</li>
+      <li>${e.equipos.length} equipo(s) registrado(s)</li>
+      <li>${ops.length} oportunidad(es) en el pipeline</li>
+      <li>${cots.length} cotización(es)</li>
+      <li>Todo su historial de actividad</li>
+    </ul>
+    <p style="font-size:13px; color:var(--red); margin-top:12px; font-weight:600;">
+      Esta acción no se puede deshacer.
+    </p>
+  `, () => {
+    const opIds = new Set(ops.map(o=>o.id));
+    DATA.empresas = DATA.empresas.filter(x=>x.id!==e.id);
+    DATA.oportunidades = DATA.oportunidades.filter(o=>o.empresaId!==e.id);
+    DATA.cotizaciones = DATA.cotizaciones.filter(c=>c.empresaId!==e.id);
+    DATA.activityLog = DATA.activityLog.filter(a=>a.empresaId!==e.id);
+    scheduleSave(); closeModal(); closeDrawer(); render();
+  }, 'Eliminar definitivamente');
+  const saveBtn = document.getElementById('modal-save');
+  if(saveBtn){ saveBtn.classList.remove('btn-primary'); saveBtn.style.background='var(--red)'; saveBtn.style.borderColor='var(--red)'; saveBtn.style.color='#fff'; }
 }
 
 /* ---- Nuevo contacto ---- */
